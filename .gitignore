@@ -32,6 +32,7 @@ nbdist/
 # 本番環境の設定ファイルは含めない
 application-prod.properties
 application-dev.properties
+application.properties
 .env.dev
 .env.prod
 
@@ -43,3 +44,6 @@ application-dev.properties
 
 ### macOSの不要ファイル ###
 .DS_Store
+
+### トークン認証
+/src/main/java/io/github/Toku2001/trackandfieldapp/security/JwtUtil.java
