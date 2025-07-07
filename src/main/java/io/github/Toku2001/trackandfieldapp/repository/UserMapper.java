@@ -9,5 +9,13 @@ import io.github.Toku2001.trackandfieldapp.entity.User_Info;
 public interface UserMapper {
     //ログイン
 	User_Info getUserInfo(
-		@Param("userName") String userName);
+		@Param("userName") String userName
+	);
+
+	//ユーザー新規登録
+    int registerUser(
+		@Param("userName") String userName, 
+		@Param("userPassword") String userPassword,
+		@Param("userMail") String userMail
+	);
 }
