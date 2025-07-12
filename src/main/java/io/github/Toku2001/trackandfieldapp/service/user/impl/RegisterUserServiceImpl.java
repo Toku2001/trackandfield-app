@@ -21,10 +21,11 @@ public class RegisterUserServiceImpl implements RegisterUserService{
     public int registerUser(RegisterRequest request) {
 		System.out.println("RegisterService received: " + request.getUserName() + request.getUserMail());
 		String hashedPassword = encoder.encode(request.getUserPassword());
-        int registerNumber = userMapper.registerUser(request.getUserName(), hashedPassword ,request.getUserMail());
-        if (registerNumber == 0) {
-            throw new DatabaseOperationException("登録できませんでした", new Exception());
-        }
-        return registerNumber;
+		try {
+			int registerNumber = userMapper.registerUser(request.getUserName(), hashedPassword ,request.getUserMail());
+	        return registerNumber;
+		}catch(Exception e) {
+			throw new DatabaseOperationException("登録できませんでした", new Exception());
+		}
     }
 }

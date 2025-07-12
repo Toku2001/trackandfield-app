@@ -1,6 +1,12 @@
 package io.github.Toku2001.trackandfieldapp.controller;
 
+import java.util.Map;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +19,7 @@ import io.github.Toku2001.trackandfieldapp.dto.password.NewPasswordRequest;
 import io.github.Toku2001.trackandfieldapp.dto.password.PasswordResetRequest;
 import io.github.Toku2001.trackandfieldapp.dto.user.RegisterRequest;
 import io.github.Toku2001.trackandfieldapp.dto.user.RegisterResponse;
+import io.github.Toku2001.trackandfieldapp.exception.DatabaseOperationException;
 import io.github.Toku2001.trackandfieldapp.service.authentication.TokenService;
 import io.github.Toku2001.trackandfieldapp.service.password.PasswordResetService;
 import io.github.Toku2001.trackandfieldapp.service.user.LoginService;
@@ -49,13 +56,19 @@ public class AuthController {
     }
 
     @PostMapping("/register-user")
-	public RegisterResponse registerUser(@RequestBody RegisterRequest request) {
-		int registerNumber = registerUserService.registerUser(request);
-		if(registerNumber == 0) {
-			System.out.println("RegisterUser failed: ユーザー登録が正常に完了しませんでした");
-			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
-		}
-		return new RegisterResponse(request.getUserName(), registerNumber);
+	public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest request, BindingResult bindingResult) {
+    	if (bindingResult.hasErrors()) {
+            // 最初のエラーメッセージを取得して返す例
+            String errorMsg = bindingResult.getAllErrors().get(0).getDefaultMessage();
+            return ResponseEntity.badRequest().body(Map.of("error", errorMsg));
+        }
+    	try {
+            int result = registerUserService.registerUser(request);
+            return ResponseEntity.ok(new RegisterResponse(request.getUserName(), result));
+        } catch (DatabaseOperationException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body(Map.of("error", e.getMessage()));
+        }
 	}
 
     @PostMapping("/request-password-reset")
