@@ -32,6 +32,12 @@ dependencies {
     // security
     implementation 'org.springframework.security:spring-security-crypto'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    
+    // バリデーションAPI
+    implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
+
+    // バリデーションの実装（Hibernate Validator）
+    implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
 
     // MyBatis
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
