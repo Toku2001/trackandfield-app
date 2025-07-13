@@ -63,8 +63,8 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("error", errorMsg));
         }
     	try {
-            int result = registerUserService.registerUser(request);
-            return ResponseEntity.ok(new RegisterResponse(request.getUserName(), result));
+            int registerNumber = registerUserService.registerUser(request);
+            return ResponseEntity.ok(new RegisterResponse(request.getUserName(), registerNumber));
         } catch (DatabaseOperationException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                  .body(Map.of("error", e.getMessage()));
