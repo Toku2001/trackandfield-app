@@ -2,7 +2,7 @@ name: Jacoco Coverage Report
 
 on:
   pull_request:
-    branches: [ "develop" ]  # developブランチへのプルリク時に実行
+    branches: [ "develop" ]
 
 jobs:
   test:
@@ -20,15 +20,13 @@ jobs:
 
       - name: Grant execute permission for Gradle
         run: chmod +x ./gradlew
-        working-directory: trackandfield-app
 
       - name: Run tests with coverage
         run: ./gradlew clean test jacocoTestReport
-        working-directory: trackandfield-app
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
           files: trackandfield-app/build/reports/jacoco/test/jacocoTestReport.xml
-          name: jacoco-report
+          name: jacoco-reporta
           fail_ci_if_error: true
