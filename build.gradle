@@ -1,5 +1,6 @@
 plugins {
 	id 'java'
+	id 'jacoco' 
 	id 'war'
 	id 'org.springframework.boot' version '3.4.5'
 	id 'io.spring.dependency-management' version '1.1.7'
@@ -12,6 +13,31 @@ java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(21)
 	}
+}
+
+jacoco {
+    toolVersion = "0.8.11" 
+}
+
+jacocoTestReport {
+    dependsOn test // テストの後に実行
+
+    reports {
+        xml.required = true
+        csv.required = false
+        html.required = true
+        html.outputLocation = layout.buildDirectory.dir('reports/jacoco/test/html') 
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 1.00 // カバレッジ 100%以上
+            }
+        }
+    }
 }
 
 configurations {
