@@ -3,6 +3,8 @@ name: Jacoco Coverage Report
 on:
   pull_request:
     branches: [ "develop" ]
+  push:
+    branches: [ "develop" ]
 
 jobs:
   test:
