@@ -16,9 +16,9 @@ jobs:
         ports:
           - 5432:5432
         env:
-          POSTGRES_DB: trackandfield
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ${{ secrets.POSTGRES_URL }}
+          POSTGRES_USER: ${{ secrets.DATASOURCE_USERNAME }}
+          POSTGRES_PASSWORD: ${{ secrets.DATASOURCE_PASSWORD }}
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
