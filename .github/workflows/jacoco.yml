@@ -25,10 +25,10 @@ jobs:
         run: |
           mkdir -p src/main/resources
           cat <<EOF > src/main/resources/application-ci.properties
-          jwt.secret=${{ secrets.JWT_SECRET }}
-          sendgrid.api.key=${{ secrets.SENDGRID_KEY }}
-          sendgrid.from.email=${{ secrets.USER_MAIL }}
-          EOF
+jwt.secret=${{ secrets.JWT_SECRET }}
+sendgrid.api.key=${{ secrets.SENDGRID_KEY }}
+sendgrid.from.email=${{ secrets.USER_MAIL }}
+EOF
 
       - name: Run tests with coverage
         run: ./gradlew clean test jacocoTestReport -Dspring.profiles.active=ci
