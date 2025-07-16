@@ -1,7 +1,9 @@
-name: Jacoco Coverage Report
+name: Jacoco Coverage Report (develop)
 
 on:
   pull_request:
+    branches: [ "develop" ]
+  push:
     branches: [ "develop" ]
 
 jobs:
