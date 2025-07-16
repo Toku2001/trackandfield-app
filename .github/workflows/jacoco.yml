@@ -22,12 +22,11 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Run tests with coverage
+        run: ./gradlew clean test jacocoTestReport
         env:
-          jwt.secret: ${{ secrets.JWT_SECRET }}
-          sendgrid.api.key: ${{ secrets.SENDGRID_KEY }}
-          sendgrid.from.email: ${{ secrets.USER_MAIL }}
-        run: |
-          ./gradlew clean test jacocoTestReport
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          SENDGRID_KEY: ${{ secrets.SENDGRID_KEY }}
+          USER_MAIL: ${{ secrets.USER_MAIL }}
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
