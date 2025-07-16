@@ -22,7 +22,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Run tests with coverage
-        run: ./gradlew clean test jacocoTestReport
+        run: ./gradlew clean test jacocoTestReport -Dspring.profiles.active=ci
         env:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           SENDGRID_KEY: ${{ secrets.SENDGRID_KEY }}
