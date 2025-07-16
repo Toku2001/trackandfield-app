@@ -25,9 +25,9 @@ jobs:
         run: |
           ./gradlew clean test jacocoTestReport \
             -Dspring.profiles.active=ci \
-            -DJWT_SECRET="${{ secrets.JWT_SECRET }}" \
-            -DSENDGRID_KEY="${{ secrets.SENDGRID_KEY }}" \
-            -DUSER_MAIL="${{ secrets.USER_MAIL }}"
+            -Djwt.secret="${{ secrets.JWT_SECRET }}" \
+            -Dsendgrid.api.key="${{ secrets.SENDGRID_KEY }}" \
+            -Dsendgrid.from.email="${{ secrets.USER_MAIL }}"
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
