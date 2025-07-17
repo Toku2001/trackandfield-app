@@ -13,15 +13,12 @@ jobs:
         ports:
           - 5432:5432
         env:
-          # POSTGRES_DB: ${{ secrets.POSTGRES_URL }}
-          # POSTGRES_USER: ${{ secrets.DATASOURCE_USERNAME }}
-          # POSTGRES_PASSWORD: ${{ secrets.DATASOURCE_PASSWORD }}
-          POSTGRES_DB: test
-          POSTGRES_USER: testuser
-          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: ${{ secrets.DB_NAME}}
+          POSTGRES_USER: ${{ secrets.DATASOURCE_USERNAME }}
+          POSTGRES_PASSWORD: ${{ secrets.DATASOURCE_PASSWORD }}
         options: >-
           --health-cmd pg_isready
-          --health-interval 60s
+          --health-interval 10s
           --health-timeout 5s
           --health-retries 5
 
@@ -40,6 +37,10 @@ jobs:
 
       - name: Run tests with coverage
         run: ./gradlew clean test --tests "io.github.Toku2001.trackandfieldapp.controller.RegisterUserControllerTest" jacocoTestReport -Dspring.profiles.active=ci
+        env:
+          POSTGRES_DB: ${{ secrets.POSTGRES_URL }}
+          POSTGRES_USER: ${{ secrets.DATASOURCE_USERNAME }}
+          POSTGRES_PASSWORD: ${{ secrets.DATASOURCE_PASSWORD }}
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
