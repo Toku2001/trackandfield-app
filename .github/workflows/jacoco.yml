@@ -15,6 +15,10 @@ jobs:
         image: postgres:15
         ports:
           - 5432:5432
+        env:
+          POSTGRES_DB: ${{ secrets.POSTGRES_URL }}
+          POSTGRES_USER: ${{ secrets.DATASOURCE_USERNAME }}
+          POSTGRES_PASSWORD: ${{ secrets.DATASOURCE_PASSWORD }}
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -22,6 +26,17 @@ jobs:
           --health-retries 5
 
     steps:
+      - name: Up db and wait for ready
+        run: |
+          docker compose up db -d
+          set +e
+          for (( i=0; i<10; ++i )); do
+            docker compose exec db pg_isready
+            if [ $? -eq 0 ]; then
+              break
+            fi
+            sleep 1;
+          done
       - name: Checkout code
         uses: actions/checkout@v4
 
