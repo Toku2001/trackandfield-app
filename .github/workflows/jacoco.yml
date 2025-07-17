@@ -36,11 +36,14 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Run tests with coverage
-        run: ./gradlew clean test --tests "io.github.Toku2001.trackandfieldapp.controller.RegisterUserControllerTest" jacocoTestReport -Dspring.profiles.active=ci
-        env:
-          POSTGRES_DB: ${{ secrets.POSTGRES_URL }}
-          POSTGRES_USER: ${{ secrets.DATASOURCE_USERNAME }}
-          POSTGRES_PASSWORD: ${{ secrets.DATASOURCE_PASSWORD }}
+        run: |
+          ./gradlew clean test \
+            --tests "io.github.Toku2001.trackandfieldapp.controller.RegisterUserControllerTest" \
+            jacocoTestReport \
+            -Dspring.profiles.active=ci \
+            -DPOSTGRES_DB=${{ secrets.POSTGRES_URL }} \
+            -DPOSTGRES_USER=${{ secrets.DATASOURCE_USERNAME }} \
+            -DPOSTGRES_PASSWORD=${{ secrets.DATASOURCE_PASSWORD }}
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
