@@ -34,6 +34,13 @@ jobs:
 
       - name: Grant execute permission for Gradle
         run: chmod +x ./gradlew
+      
+      - name: Upload test report artifact
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: build/reports/tests/test
 
       - name: Run tests with coverage
         run: |
@@ -43,7 +50,8 @@ jobs:
             -Dspring.profiles.active=ci \
             -DDB_URL=jdbc:postgresql://localhost:5432/${{ secrets.DB_NAME }} \
             -DPOSTGRES_USER=${{ secrets.DATASOURCE_USERNAME }} \
-            -DPOSTGRES_PASSWORD=${{ secrets.DATASOURCE_PASSWORD }}
+            -DPOSTGRES_PASSWORD=${{ secrets.DATASOURCE_PASSWORD }} \
+            --info --stacktrace
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
