@@ -7,6 +7,20 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: ${{ secrets.POSTGRES_URL }}
+          POSTGRES_USER: ${{ secrets.DATASOURCE_USERNAME }}
+          POSTGRES_PASSWORD: ${{ secrets.DATASOURCE_PASSWORD }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: Checkout code
@@ -22,7 +36,11 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Run tests with coverage
-        run: ./gradlew clean test --tests "io.github.Toku2001.trackandfieldapp.controller.RegisterUserControllerTest" jacocoTestReport
+        run: ./gradlew clean test --tests "io.github.Toku2001.trackandfieldapp.controller.RegisterUserControllerTest" jacocoTestReport -Dspring.profiles.active=ci
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          SENDGRID_KEY: ${{ secrets.SENDGRID_KEY }}
+          USER_MAIL: ${{ secrets.USER_MAIL }}
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
