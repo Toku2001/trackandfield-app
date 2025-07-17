@@ -44,9 +44,6 @@ jobs:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           SENDGRID_KEY: ${{ secrets.SENDGRID_KEY }}
           USER_MAIL: ${{ secrets.USER_MAIL }}
-          SPRING_DATASOURCE_URL: ${{ secrets.POSTGRES_URL }}
-          SPRING_DATASOURCE_USERNAME: ${{ secrets.DATASOURCE_USERNAME }}
-          SPRING_DATASOURCE_PASSWORD: ${{ secrets.DATASOURCE_PASSWORD }}
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
