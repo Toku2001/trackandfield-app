@@ -13,9 +13,12 @@ jobs:
         ports:
           - 5432:5432
         env:
-          POSTGRES_DB: ${{ secrets.POSTGRES_URL }}
-          POSTGRES_USER: ${{ secrets.DATASOURCE_USERNAME }}
-          POSTGRES_PASSWORD: ${{ secrets.DATASOURCE_PASSWORD }}
+          # POSTGRES_DB: ${{ secrets.POSTGRES_URL }}
+          # POSTGRES_USER: ${{ secrets.DATASOURCE_USERNAME }}
+          # POSTGRES_PASSWORD: ${{ secrets.DATASOURCE_PASSWORD }}
+          POSTGRES_DB: test
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpassword
         options: >-
           --health-cmd pg_isready
           --health-interval 60s
