@@ -1,42 +1,14 @@
-name: Jacoco Coverage Report (develop)
+name: Jacoco Coverage Report
 
 on:
   pull_request:
-    branches: [ "develop" ]
-  push:
     branches: [ "develop" ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:15
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_DB: ${{ secrets.POSTGRES_URL }}
-          POSTGRES_USER: ${{ secrets.DATASOURCE_USERNAME }}
-          POSTGRES_PASSWORD: ${{ secrets.DATASOURCE_PASSWORD }}
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
-      - name: Up db and wait for ready
-        run: |
-          docker compose up db -d
-          set +e
-          for (( i=0; i<10; ++i )); do
-            docker compose exec db pg_isready
-            if [ $? -eq 0 ]; then
-              break
-            fi
-            sleep 1;
-          done
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -50,11 +22,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Run tests with coverage
-        run: ./gradlew clean test jacocoTestReport -Dspring.profiles.active=ci
-        env:
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          SENDGRID_KEY: ${{ secrets.SENDGRID_KEY }}
-          USER_MAIL: ${{ secrets.USER_MAIL }}
+        run: ./gradlew clean test jacocoTestReport
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
