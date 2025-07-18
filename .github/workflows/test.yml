@@ -62,6 +62,7 @@ jobs:
           ./gradlew clean test \
             --tests "io.github.Toku2001.trackandfieldapp.controller.RegisterUserControllerTest" \
             jacocoTestReport \
+            -Dspring.profiles.active=ci \
             -DDB_URL=jdbc:postgresql://localhost:5432/${{ env.POSTGRES_DB }} \
             -DPOSTGRES_USER=${{ env.POSTGRES_USER }} \
             -DPOSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }} \
