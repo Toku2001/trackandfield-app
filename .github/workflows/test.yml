@@ -37,10 +37,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y postgresql-client
-          psql -h localhost -U ${{ env.DATASOURCE_USERNAME }} -d ${{ env.DB_NAME }} -c "SELECT current_database();"
-          psql -h localhost -U ${{ env.DATASOURCE_USERNAME }} -d ${{ env.DB_NAME }} -c "SELECT version();"
+          psql -h localhost -U ${{ env.POSTGRES_USER }} -d ${{ env.DB_NAME }} -c "SELECT current_database();"
+          psql -h localhost -U ${{ env.POSTGRES_USER }} -d ${{ env.DB_NAME }} -c "SELECT version();"
         env:
-          PGPASSWORD: ${{ env.STGRES_PASSWORD }}
+          PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
 
       - name: Checkout code
         uses: actions/checkout@v4
