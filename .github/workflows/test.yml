@@ -37,8 +37,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y postgresql-client
-          psql -h localhost -U ${{ env.POSTGRES_USER }} -d ${{ env.DB_NAME }} -c "SELECT current_database();"
-          psql -h localhost -U ${{ env.POSTGRES_USER }} -d ${{ env.DB_NAME }} -c "SELECT version();"
+          psql -h localhost -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -c "SELECT current_database();"
+          psql -h localhost -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -c "SELECT version();"
         env:
           PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
 
