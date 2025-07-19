@@ -63,8 +63,8 @@ jobs:
           jacocoTestReport \
           -Dspring.profiles.active=ci \
           -DDB_URL=jdbc:postgresql://localhost:5432/${{ secrets.DB_NAME }} \
-          -DPOSTGRES_USER=${{ secrets.DATASOURCE_USERNAME }} \
-          -DPOSTGRES_PASSWORD=${{ secrets.DATASOURCE_PASSWORD }} \
+          -DPOSTGRES_USER=trackandfield \
+          -DPOSTGRES_PASSWORD=trackandfield \
           -DJWT_SECRET=${{ secrets.JWT_SECRET }} \
           -DSENDGRID_KEY=${{ secrets.SENDGRID_KEY }} \
           -DUSER_MAIL=${{ secrets.USER_MAIL }}
