@@ -7,9 +7,9 @@ on:
     branches: [ "develop" ]
   
 env:
-  POSTGRES_DB: ${{ secrets.DB_NAME }}
-  POSTGRES_USER: ${{ secrets.DATASOURCE_USERNAME }}
-  POSTGRES_PASSWORD: ${{ secrets.DATASOURCE_PASSWORD }}
+  POSTGRES_DB: trackandfield
+  POSTGRES_USER: trackandfield
+  POSTGRES_PASSWORD: trackandfield
   POSTGRES_HOST: 127.0.0.1
   POSTGRES_PORT: 5432
   JWT_SECRET: ${{ secrets.JWT_SECRET }}
