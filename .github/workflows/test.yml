@@ -25,9 +25,9 @@ jobs:
         ports:
           - 5432:5432
         env:
-          POSTGRES_DB: ${{ env.POSTGRES_DB }}
-          POSTGRES_USER: ${{ env.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_DB: trackandfield
+          POSTGRES_USER: trackandfield
+          POSTGRES_PASSWORD: trackandfield
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -39,10 +39,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y postgresql-client
-          psql -h localhost -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -c "SELECT current_database();"
-          psql -h localhost -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -c "SELECT version();"
+          psql -h localhost -U trackandfield -d trackandfield -c "SELECT current_database();"
+          psql -h localhost -U trackandfield -d trackandfield -c "SELECT version();"
         env:
-          PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          PGPASSWORD: trackandfield
 
       - name: Checkout code
         uses: actions/checkout@v4
@@ -58,6 +58,14 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          ./gradlew clean test \
-          --tests "io.github.Toku2001.trackandfieldapp.controller.RegisterUserControllerTest" \
-            
+          ./gradlew clean test jacocoTestReport \
+            --tests "io.github.Toku2001.trackandfieldapp.controller.RegisterUserControllerTest"
+        env:
+          POSTGRES_DB: trackandfield
+          POSTGRES_USER: trackandfield
+          POSTGRES_PASSWORD: trackandfield
+          POSTGRES_HOST: 127.0.0.1
+          POSTGRES_PORT: 5432
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          SENDGRID_KEY: ${{ secrets.SENDGRID_KEY }}
+          USER_MAIL: ${{ secrets.USER_MAIL }}
