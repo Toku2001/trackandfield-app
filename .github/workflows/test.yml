@@ -1,4 +1,4 @@
-name: Test PostgreSQL Only
+name: Test PostgreSQL Setting And Authenticate Functions
 
 on:
   push:
@@ -13,8 +13,6 @@ env:
   POSTGRES_HOST: 127.0.0.1
   POSTGRES_PORT: 5432
   JWT_SECRET: ${{ secrets.JWT_SECRET }}
-  SENDGRID_KEY: ${{ secrets.SENDGRID_KEY }}
-  USER_MAIL: ${{ secrets.USER_MAIL }}
 
 jobs:
   check-postgres:
@@ -67,5 +65,3 @@ jobs:
           POSTGRES_HOST: 127.0.0.1
           POSTGRES_PORT: 5432
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          SENDGRID_KEY: ${{ secrets.SENDGRID_KEY }}
-          USER_MAIL: ${{ secrets.USER_MAIL }}

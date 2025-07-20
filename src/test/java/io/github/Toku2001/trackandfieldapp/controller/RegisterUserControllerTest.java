@@ -130,6 +130,23 @@ public class RegisterUserControllerTest {
     }
 
     @Test
+    void registerUser_Nothing_UserMail() throws Exception {
+        String json = """
+        {
+          "userName": "testUser",
+          "userPassword": "password123",
+          "userMail": ""
+        }
+        """;
+
+        mockMvc.perform(post("/auth/register-user")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+		        .andExpect(status().isBadRequest())
+		        .andExpect(jsonPath("$.error").value("パスワードは必須です"));
+    }
+
+    @Test
     void registerUser_fails_when_service_returns_zero() throws Exception {
     	
         userMapper.registerUser("errorUser", "errorPassword", "errortest@example.com");
