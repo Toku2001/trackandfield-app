@@ -143,7 +143,7 @@ public class RegisterUserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
 		        .andExpect(status().isBadRequest())
-		        .andExpect(jsonPath("$.error").value("パスワードは必須です"));
+		        .andExpect(jsonPath("$.error").value("メールアドレスは必須です"));
     }
 
     @Test
