@@ -56,10 +56,10 @@ jobs:
       - name: Grant execute permission for Gradle
         run: chmod +x ./gradlew
 
-      - name: Run tests with coverage
+      - name: Run tests and generate coverage report
         run: |
-          ./gradlew clean test jacocoTestReport \
-            --tests "io.github.Toku2001.trackandfieldapp.controller.RegisterUserControllerTest"
+          ./gradlew clean test --tests "io.github.Toku2001.trackandfieldapp.controller.RegisterUserControllerTest"
+          ./gradlew jacocoTestReport
         env:
           POSTGRES_DB: trackandfield
           POSTGRES_USER: trackandfield
