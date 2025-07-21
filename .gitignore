@@ -1,6 +1,7 @@
 ### Build ###
 .gradle/
 build/
+!build/reports/jacoco/test/html/index.html
 out/
 
 ### STS (Spring Tool Suite) ###
