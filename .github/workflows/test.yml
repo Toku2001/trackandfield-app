@@ -69,3 +69,9 @@ jobs:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           SENDGRID_KEY: ${{ secrets.SENDGRID_KEY }}
           USER_MAIL: ${{ secrets.USER_MAIL }}
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with: 
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: build/reports/jacoco/test/jacocoTestReport.xml
