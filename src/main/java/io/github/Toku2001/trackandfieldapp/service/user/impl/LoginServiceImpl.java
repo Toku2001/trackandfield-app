@@ -23,20 +23,33 @@ public class LoginServiceImpl implements LoginService{
 	private final JwtUtil jwtUtil;
 	
 	@Override
-    public LoginResponse login(LoginRequest request) {
-		System.out.println("LoginService received: " + request.getUserName());
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-		User_Info user_Info = userMapper.getUserInfo(request.getUserName());
-		String hashedUserPassword = user_Info.getUser_Password();
-		boolean matches = encoder.matches(request.getUserPassword(), hashedUserPassword);
-		if(matches) {
-			String accessToken = jwtUtil.generateAccessToken(user_Info);
-			String refreshToken = jwtUtil.generateRefreshToken(user_Info);
-			int registerNumber = tokenMapper.updateRefreshToken(user_Info.getUser_Id(), refreshToken);
-			if(registerNumber == 1) {
-				return new LoginResponse(user_Info.getUser_Name(), accessToken);
-			}
-        }
-		throw new BadCredentialsException("入力されたユーザー名またはパスワードが異なります。");
-    }
+	public LoginResponse login(LoginRequest request) {
+	    System.out.println("LoginService received: " + request.getUserName());
+	    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+	    User_Info user_Info = userMapper.getUserInfo(request.getUserName());
+
+	    if (user_Info == null) {
+	        // ユーザーが存在しない場合
+	        throw new BadCredentialsException("入力されたユーザー名またはパスワードが異なります。");
+	    }
+
+	    String hashedUserPassword = user_Info.getUser_Password();
+	    boolean matches = encoder.matches(request.getUserPassword(), hashedUserPassword);
+
+	    if (!matches) {
+	        // パスワードが一致しない場合
+	        throw new BadCredentialsException("入力されたユーザー名またはパスワードが異なります。");
+	    }
+
+	    String accessToken = jwtUtil.generateAccessToken(user_Info);
+	    String refreshToken = jwtUtil.generateRefreshToken(user_Info);
+	    int registerNumber = tokenMapper.updateRefreshToken(user_Info.getUser_Id(), refreshToken);
+
+	    if (registerNumber != 1) {
+	        throw new RuntimeException("トークン登録処理に失敗しました。");
+	    }
+
+	    return new LoginResponse(user_Info.getUser_Name(), accessToken);
+	}
 }

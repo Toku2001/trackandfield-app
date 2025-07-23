@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,12 +38,11 @@ public class AuthController {
     
     @PostMapping("/login")
     public LoginResponse login(@RequestBody LoginRequest request) {
-    	LoginResponse loginResponse = loginService.login(request);
-        if (loginResponse == null) {
-            System.out.println("Login failed: user not found");
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+    	try {
+            return loginService.login(request);
+        } catch (BadCredentialsException ex) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ex.getMessage());
         }
-        return loginResponse;
     }
     
     @PostMapping("/logout")
