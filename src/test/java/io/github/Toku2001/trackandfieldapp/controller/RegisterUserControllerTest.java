@@ -1,5 +1,6 @@
 package io.github.Toku2001.trackandfieldapp.controller;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -10,8 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.jayway.jsonpath.JsonPath;
 
 import io.github.Toku2001.trackandfieldapp.repository.UserMapper;
 
@@ -148,8 +154,23 @@ public class RegisterUserControllerTest {
 
     @Test
     void registerUser_fails_when_service_returns_zero() throws Exception {
-    	
-        userMapper.registerUser("errorUser", "errorPassword", "errortest@example.com");
+        
+    	// 1. 事前にユーザーを登録
+    	String registerJson = """
+    	        {
+    			    "userName": "errorUser",
+    			    "userPassword": "errorPassword",
+    			    "userMail": "errortest@example.com"
+    	        }
+    	        """;
+
+    	        mockMvc.perform(post("/auth/register-user")
+    	                        .contentType(MediaType.APPLICATION_JSON)
+    	                        .content(registerJson))
+    	        				.andDo(print()) 
+    	                .andExpect(status().isOk())
+    	                .andExpect(jsonPath("$.userName").value("errorUser"))
+    	                .andExpect(jsonPath("$.registerNumber").isNumber()); 
 
         String json = """
         {
@@ -163,6 +184,91 @@ public class RegisterUserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
         	.andExpect(status().isInternalServerError()) 
-            .andExpect(jsonPath("$.error").value("登録できませんでした"));
+          .andExpect(jsonPath("$.error").value("登録できませんでした"));
+    }
+
+    @Test
+    void login_success() throws Exception {
+    	// 1. 事前にユーザーを登録
+    	String registerJson = """
+    	        {
+    			    "userName": "loginuser",
+    			    "userPassword": "loginpassword",
+    			    "userMail": "login@example.com"
+    	        }
+    	        """;
+
+    	        mockMvc.perform(post("/auth/register-user")
+    	                        .contentType(MediaType.APPLICATION_JSON)
+    	                        .content(registerJson))
+    	        				.andDo(print()) 
+    	                .andExpect(status().isOk())
+    	                .andExpect(jsonPath("$.userName").value("loginuser"))
+    	                .andExpect(jsonPath("$.registerNumber").isNumber()); 
+
+        String json = """
+        {
+          "userName": "loginuser",
+          "userPassword": "loginpassword"
+        }
+        """;
+
+        mockMvc.perform(post("/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+        	.andExpect(status().isOk())
+          .andExpect(jsonPath("$.userName").value("loginuser"))
+          .andExpect(jsonPath("$.accessToken").isNotEmpty()); 
+    }
+
+    @Test
+    void login_failed() throws Exception {
+        String json = """
+            {
+              "userName": "failduser",
+              "userPassword": "faildpassword"
+            }
+            """;
+
+        mockMvc.perform(post("/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isUnauthorized())
+            .andExpect(result ->
+                assertTrue(result.getResolvedException() instanceof ResponseStatusException))
+            .andExpect(result ->
+                assertEquals("入力されたユーザー名またはパスワードが異なります。",
+                             ((ResponseStatusException) result.getResolvedException()).getReason()));
+    }
+
+    @Test
+    void logout_success() throws Exception {
+        // ユーザー登録（ハッシュ化済み）
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String encodedPassword = encoder.encode("logoutpassword");
+        userMapper.registerUser("logoutuser", encodedPassword, "logout@example.com");
+
+        // ログインしてトークン取得
+        MockHttpServletResponse loginResponse = mockMvc.perform(post("/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                {
+                  "userName": "logoutuser",
+                  "userPassword": "logoutpassword"
+                }
+                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").isNotEmpty())
+                .andReturn()
+                .getResponse();
+
+        String json = loginResponse.getContentAsString();
+        String accessToken = JsonPath.read(json, "$.accessToken");
+
+        // ログアウト実行
+        mockMvc.perform(post("/auth/logout")
+                .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andExpect(content().string("true"));
     }
 }
