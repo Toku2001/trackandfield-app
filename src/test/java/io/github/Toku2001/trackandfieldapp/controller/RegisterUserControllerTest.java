@@ -1,15 +1,21 @@
 package io.github.Toku2001.trackandfieldapp.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,7 +25,12 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.jayway.jsonpath.JsonPath;
 
+import io.github.Toku2001.trackandfieldapp.dto.password.PasswordResetRequest;
+import io.github.Toku2001.trackandfieldapp.entity.PasswordResetToken;
+import io.github.Toku2001.trackandfieldapp.repository.PasswordMapper;
 import io.github.Toku2001.trackandfieldapp.repository.UserMapper;
+import io.github.Toku2001.trackandfieldapp.service.password.PasswordResetService;
+import io.github.Toku2001.trackandfieldapp.service.user.MailService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -27,11 +38,20 @@ import io.github.Toku2001.trackandfieldapp.repository.UserMapper;
 @MapperScan("io.github.Toku2001.trackandfieldapp.repository") 
 public class RegisterUserControllerTest {
 
-    @Autowired
+	@Autowired
     private MockMvc mockMvc;
 
     @Autowired
     private UserMapper userMapper;
+
+    @MockBean
+    private PasswordMapper passwordMapper;
+
+    @MockBean
+    private MailService mailService;
+
+    @Autowired
+    private PasswordResetService passwordResetService;
 
     @Test
     void registerUser_success() throws Exception {
@@ -270,5 +290,90 @@ public class RegisterUserControllerTest {
                 .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk())
                 .andExpect(content().string("true"));
+    }
+    
+    @Test
+    void requestPasswordReset_success() throws Exception {
+        String resetRequestJson = """
+            {
+                "userName": "resetuser",
+                "userMail": "reset@example.com"
+            }
+            """;
+
+        // モック: passwordMapper.insert はvoidなので doNothing
+        doNothing().when(passwordMapper).insert(any(PasswordResetToken.class));
+
+        // モック: mailService.sendPasswordResetMail もvoidなので doNothing
+        doNothing().when(mailService).sendPasswordResetMail(any(PasswordResetRequest.class), anyString());
+
+        mockMvc.perform(post("/auth/request-password-reset") 
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(resetRequestJson))
+            .andExpect(status().isOk())
+            .andExpect(content().string("再設定リンクを送信しました。"));
+
+        // 呼び出し検証（任意）
+        verify(passwordMapper, times(1)).insert(any(PasswordResetToken.class));
+        verify(mailService, times(1)).sendPasswordResetMail(any(PasswordResetRequest.class), anyString());
+    }
+    
+    @Test
+    void resetPassword_success() throws Exception {
+        String requestJson = """
+            {
+                "token": "valid-token",
+                "userName": "resetuser",
+                "newUserPassword": "newStrongPassword123"
+            }
+            """;
+
+        PasswordResetToken validToken = new PasswordResetToken();
+        validToken.setUser_Mail("reset@example.com");
+        validToken.setExpiry_Date(LocalDateTime.now().plusMinutes(10)); // 有効な期限
+
+        // モックの設定
+        when(passwordMapper.findUserMail("resetuser", "valid-token"))
+            .thenReturn(Optional.of(validToken));
+
+        when(passwordMapper.updateNewPassword(eq("resetuser"), eq("reset@example.com"), anyString()))
+            .thenReturn(1); // パスワード更新成功
+
+        doNothing().when(passwordMapper).deleteByToken("valid-token");
+
+        // 実行と検証
+        mockMvc.perform(post("/auth/reset-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestJson))
+            .andExpect(status().isOk())
+            .andExpect(content().string("パスワードが更新されました。"));
+
+        // 呼び出し検証
+        verify(passwordMapper).updateNewPassword(eq("resetuser"), eq("reset@example.com"), anyString());
+        verify(passwordMapper).deleteByToken("valid-token");
+    }
+    
+    @Test
+    void resetPassword_failure() throws Exception {
+        String requestJson = """
+            {
+                "token": "invalid-or-expired-token",
+                "userName": "resetuser",
+                "newUserPassword": "newPassword"
+            }
+            """;
+
+        PasswordResetToken expiredToken = new PasswordResetToken();
+        expiredToken.setUser_Mail("reset@example.com");
+        expiredToken.setExpiry_Date(LocalDateTime.now().minusMinutes(1)); // トークン期限切れ
+
+        when(passwordMapper.findUserMail("resetuser", "invalid-or-expired-token"))
+            .thenReturn(Optional.of(expiredToken));
+
+        mockMvc.perform(post("/auth/reset-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestJson))
+            .andExpect(status().isOk())
+            .andExpect(content().string("トークンが無効または期限切れです。"));
     }
 }
