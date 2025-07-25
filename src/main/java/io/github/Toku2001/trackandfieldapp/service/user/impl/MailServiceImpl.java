@@ -1,21 +1,15 @@
 package io.github.Toku2001.trackandfieldapp.service.user.impl;
 
-import java.io.IOException;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.sendgrid.Method;
-import com.sendgrid.Request;
-import com.sendgrid.Response;
-import com.sendgrid.SendGrid;
-import com.sendgrid.helpers.mail.Mail;
-import com.sendgrid.helpers.mail.objects.Content;
-import com.sendgrid.helpers.mail.objects.Email;
+import com.resend.Resend;
+import com.resend.core.exception.ResendException;
+import com.resend.services.emails.model.CreateEmailOptions;
+import com.resend.services.emails.model.CreateEmailResponse;
 
 import io.github.Toku2001.trackandfieldapp.dto.password.PasswordResetRequest;
-import io.github.Toku2001.trackandfieldapp.exception.MailSendException;
 import io.github.Toku2001.trackandfieldapp.service.user.MailService;
 import lombok.RequiredArgsConstructor;
 
@@ -23,34 +17,32 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 @RequiredArgsConstructor
 public class MailServiceImpl implements MailService{
-    //SEND.GRIDのAPIKey
-    @Value("${sendgrid.api.key}")
-    private String sendGridApiKey;
+    //resendのAPIKey
+    @Value("${resend.api.key}")
+    private String resendApiKey;
     //パスワード再設定メールの送り主メールアドレス
-    @Value("${sendgrid.from.email}")
+    @Value("${resend.from.email}")
     private String fromEmail;
 
     public void sendPasswordResetMail(PasswordResetRequest userRequest, String resetLink){
-        Email from = new Email(fromEmail);
-        String subject = "【パスワード再設定】リンクのご案内";
-        Email to = new Email(userRequest.getUserMail());
-        String contentText = "以下のリンクからパスワードを再設定してください。\n\n" + resetLink;
-        Content content = new Content("text/plain", contentText);
-        Mail mail = new Mail(from, subject, to, content);
-        SendGrid sendGrid = new SendGrid(sendGridApiKey);
-        Request request = new Request();
-        try {
-            request.setMethod(Method.POST);
-            request.setEndpoint("mail/send");
-            request.setBody(mail.build());
-            Response response = sendGrid.api(request);
+    	Resend resend = new Resend(resendApiKey);
+    	CreateEmailOptions params = CreateEmailOptions.builder()
+                .from("onboarding@resend.dev")
+                .to(userRequest.getUserMail())
+                .subject("【パスワード再設定】リンクのご案内")
+                .html(
+                  "<p>以下のリンクからパスワードを再設定してください。</p>" +
+                  "<p><a href=\"" + resetLink + "\">パスワードを再設定する</a></p>" +
+                  "<p>このリンクの有効期限は24時間です。</p>" +
+                  "<p>もしこのリクエストに心当たりがない場合は、このメールを無視してください。</p>"
+                  )
+                .build();
 
-            if (response.getStatusCode() >= 400) {
-                throw new MailSendException("メール送信失敗: " + response.getBody());
-            }
-
-        } catch (IOException | RuntimeException e) {
-            throw new MailSendException("メール送信中にエラーが発生しました。", e);
+         try {
+            CreateEmailResponse data = resend.emails().send(params);
+            System.out.println(data.getId());
+        } catch (ResendException e) {
+            e.printStackTrace();
         }
     }
 }
