@@ -5,6 +5,10 @@
 	SELECT * FROM user_info 
 	WHERE user_name = #{userName}
 	</select>
+<select id="checkUser" resultType= "int">
+	SELECT count(*) FROM user_info 
+	WHERE user_name = #{userName} AND user_mail = #{userMail}
+	</select>
 <insert id="registerUser" parameterType="io.github.Toku2001.trackandfieldapp.entity.User_Info">
 	INSERT INTO user_info (user_name, user_password, user_mail) 
 	VALUES (#{userName}, #{userPassword}, #{userMail})

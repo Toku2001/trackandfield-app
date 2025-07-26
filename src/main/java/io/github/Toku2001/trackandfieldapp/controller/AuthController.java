@@ -73,8 +73,13 @@ public class AuthController {
 
     @PostMapping("/request-password-reset")
     public String requestReset(@RequestBody PasswordResetRequest request) {
+        try{
         	passwordResetService.requestReset(request);
-        return "再設定リンクを送信しました。";
+        	return "再設定リンクを送信しました。";
+        }catch(DatabaseOperationException e) {
+        	System.out.println("ユーザー登録が未完了です。");
+    		throw new ResponseStatusException(HttpStatus.FORBIDDEN, "ユーザー登録が未完了です。");
+        }
     }
 
     @PostMapping("/reset-password")

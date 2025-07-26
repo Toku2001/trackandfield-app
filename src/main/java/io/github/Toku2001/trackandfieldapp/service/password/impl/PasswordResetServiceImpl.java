@@ -13,6 +13,7 @@ import io.github.Toku2001.trackandfieldapp.dto.password.PasswordResetRequest;
 import io.github.Toku2001.trackandfieldapp.entity.PasswordResetToken;
 import io.github.Toku2001.trackandfieldapp.exception.DatabaseOperationException;
 import io.github.Toku2001.trackandfieldapp.repository.PasswordMapper;
+import io.github.Toku2001.trackandfieldapp.repository.UserMapper;
 import io.github.Toku2001.trackandfieldapp.service.password.PasswordResetService;
 import io.github.Toku2001.trackandfieldapp.service.user.MailService;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +24,16 @@ import lombok.RequiredArgsConstructor;
 public class PasswordResetServiceImpl implements PasswordResetService {
 
 	private final PasswordMapper passwordMapper;
+	private final UserMapper userMapper;
 	private final MailService mailService;
 
 	public void requestReset(PasswordResetRequest request){
 		System.out.println(request.getUserMail());
+		//パスワード再設定のリクエストをして生きたユーザーが登録されているユーザーか判定する
+		int existUser = userMapper.checkUser(request.getUserName(), request.getUserMail());
+		if(existUser == 0){			
+			throw new DatabaseOperationException("ユーザー登録が未完了のため登録を完了してください。", new Exception());
+		}
 		String token = UUID.randomUUID().toString();
 		LocalDateTime expiryDate = LocalDateTime.now().plusMinutes(10);	
 

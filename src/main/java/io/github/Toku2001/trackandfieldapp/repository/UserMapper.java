@@ -18,4 +18,10 @@ public interface UserMapper {
 		@Param("userPassword") String userPassword,
 		@Param("userMail") String userMail
 	);
+
+	//パスワード再発行をリクエストしたユーザーがすでに登録されているユーザーであるかどうか判定する
+	int checkUser(
+		@Param("userName") String userName,
+		@Param("userMail") String userMail
+	);
 }
