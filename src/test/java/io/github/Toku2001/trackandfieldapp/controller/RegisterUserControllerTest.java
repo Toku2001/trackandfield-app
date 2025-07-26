@@ -294,6 +294,10 @@ public class RegisterUserControllerTest {
     
     @Test
     void requestPasswordReset_success() throws Exception {
+    	// ユーザー登録（ハッシュ化済み）
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String encodedPassword = encoder.encode("resetpassword");
+        userMapper.registerUser("resetuser", encodedPassword, "reset@example.com");
         String resetRequestJson = """
             {
                 "userName": "resetuser",
@@ -316,6 +320,27 @@ public class RegisterUserControllerTest {
         // 呼び出し検証（任意）
         verify(passwordMapper, times(1)).insert(any(PasswordResetToken.class));
         verify(mailService, times(1)).sendPasswordResetMail(any(PasswordResetRequest.class), anyString());
+    }
+    
+    @Test
+    void requestPasswordReset_failure() throws Exception {
+        String resetRequestJson = """
+            {
+                "userName": "resetfailuser",
+                "userMail": "resetfail@example.com"
+            }
+            """;
+
+        // モック: passwordMapper.insert はvoidなので doNothing
+        doNothing().when(passwordMapper).insert(any(PasswordResetToken.class));
+
+        // モック: mailService.sendPasswordResetMail もvoidなので doNothing
+        doNothing().when(mailService).sendPasswordResetMail(any(PasswordResetRequest.class), anyString());
+
+        mockMvc.perform(post("/auth/request-password-reset") 
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(resetRequestJson))
+            .andExpect(status().isForbidden());
     }
     
     @Test
