@@ -33,7 +33,7 @@ jacocoTestReport {
         classDirectories.setFrom(
             files(classDirectories.files.collect {
                 fileTree(dir: it, exclude: [
-                    '**/AppApplication.class',  // 起動クラス
+                    '**/TrackAndFieldAppApplication.java',  // 起動クラス
                     '**/dto/**',                // DTO全体
                     '**/entity/**',             // エンティティ全体
                     '**/exception/**',          // 例外系
