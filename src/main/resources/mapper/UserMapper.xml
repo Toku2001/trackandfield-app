@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.github.Toku2001.trackandfieldapp.repository.UserMapper">
+<select id="getUserInfo" resultType="io.github.Toku2001.trackandfieldapp.entity.User_Info">
+	SELECT * FROM user_info 
+	WHERE user_name = #{userName}
+	</select>
+<select id="checkUser" resultType= "int">
+	SELECT count(*) FROM user_info 
+	WHERE user_name = #{userName} AND user_mail = #{userMail}
+	</select>
+<insert id="registerUser" parameterType="io.github.Toku2001.trackandfieldapp.entity.User_Info">
+	INSERT INTO user_info (user_name, user_password, user_mail) 
+	VALUES (#{userName}, #{userPassword}, #{userMail})
+	</insert>
+</mapper>
