@@ -35,10 +35,10 @@ public interface TrainingMapper {
 	// 	@Param("trainingComments") String trainingComments
 	// 	);
     
-    // //練習日誌削除
-    // int deleteTraining(
-    // 		@Param("userId") long userId,
-    // 		@Param("trainingTime") LocalDate trainingTime);
+     //練習日誌削除
+     int deleteTraining(
+     		@Param("userId") long userId,
+     		@Param("trainingTime") LocalDate trainingTime);
     
     // //全ユーザー情報を取得
     // List <Training_Info> getTrainings();
