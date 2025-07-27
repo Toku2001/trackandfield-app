@@ -27,13 +27,13 @@ public interface TrainingMapper {
 	//  Training_Info getTrainingByUserId(
 	// 		@Param("userId") long userId);
  
-    // //練習日誌編集
-	//  int changeTraining(
-	// 	@Param("userId") long userId,
-	// 	@Param("trainingTime") LocalDate trainingTime,
-	// 	@Param("trainingPlace") String trainingPlace,
-	// 	@Param("trainingComments") String trainingComments
-	// 	);
+    //練習日誌編集
+	 int changeTraining(
+		@Param("userId") long userId,
+		@Param("trainingTime") LocalDate trainingTime,
+		@Param("trainingPlace") String trainingPlace,
+		@Param("trainingComments") String trainingComments
+		);
     
      //練習日誌削除
      int deleteTraining(
