@@ -5,7 +5,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -23,9 +23,12 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import io.github.Toku2001.trackandfieldapp.dto.training.TrainingResponse;
 import io.github.Toku2001.trackandfieldapp.dto.user.UserDetailsForToken;
+import io.github.Toku2001.trackandfieldapp.exception.DatabaseOperationException;
 import io.github.Toku2001.trackandfieldapp.repository.PasswordMapper;
 import io.github.Toku2001.trackandfieldapp.repository.TrainingMapper;
+import io.github.Toku2001.trackandfieldapp.service.training.TrainingService;
 
 @SpringBootTest
 @AutoConfigureMockMvc  
@@ -42,6 +45,9 @@ public class TrainingTest {
 
     @MockBean
     private PasswordMapper passwordMapper;
+    
+    @MockBean
+    private TrainingService trainingService;
     
     @BeforeEach
     void setUp() {
@@ -67,7 +73,7 @@ public class TrainingTest {
             }
             """;
 
-        when(trainingMapper.registerTraining(anyLong(), any(Date.class), anyString(), anyString()))
+        when(trainingMapper.registerTraining(anyLong(), any(LocalDate.class), anyString(), anyString()))
                 .thenReturn(1); // DB登録成功を模擬
 
         mockMvc.perform(post("/api/register-training")
@@ -162,5 +168,38 @@ public class TrainingTest {
                 .content(json))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.error").value("練習コメントは255文字以内で記入してください"));
+    }
+    
+    void getTraining_Success() throws Exception {
+        LocalDate date = LocalDate.of(2025, 7, 27);
+
+        TrainingResponse mockResponse = new TrainingResponse();
+        mockResponse.setTrainingTime(date);
+        mockResponse.setTrainingPlace("競技場");
+        mockResponse.setTrainingComments("問題なし");
+
+        when(trainingService.getTraining(eq(date))).thenReturn(mockResponse);
+
+        mockMvc.perform(get("/api/get-training")
+                .param("trainingDate", date.toString())
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.trainingPlace").value("競技場"))
+            .andExpect(jsonPath("$.trainingComments").value("問題なし"))
+            .andExpect(jsonPath("$.trainingTime").value(date.toString()));
+    }
+    
+    @Test
+    void getTraining_Failure_WhenDataNotFound() throws Exception {
+        LocalDate date = LocalDate.of(2025, 7, 27);
+
+        when(trainingService.getTraining(eq(date)))
+            .thenThrow(new DatabaseOperationException("想定のデータが取得できていません。", null));
+
+        mockMvc.perform(get("/api/get-training")
+                .param("trainingDate", date.toString())
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isInternalServerError())
+            .andExpect(jsonPath("$.error").value("想定のデータが取得できていません。"));
     }
 }
