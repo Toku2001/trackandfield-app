@@ -1,0 +1,166 @@
+package io.github.Toku2001.trackandfieldapp.unittest;
+
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.Date;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+
+import io.github.Toku2001.trackandfieldapp.dto.user.UserDetailsForToken;
+import io.github.Toku2001.trackandfieldapp.repository.PasswordMapper;
+import io.github.Toku2001.trackandfieldapp.repository.TrainingMapper;
+
+@SpringBootTest
+@AutoConfigureMockMvc  
+@WithMockUser(username = "testuser", roles = {"USER"})
+@Transactional
+@MapperScan("io.github.Toku2001.trackandfieldapp.repository") 
+public class TrainingTest {
+
+	@Autowired
+    private MockMvc mockMvc;
+
+	@MockBean
+    private TrainingMapper trainingMapper;
+
+    @MockBean
+    private PasswordMapper passwordMapper;
+    
+    @BeforeEach
+    void setUp() {
+        UserDetailsForToken userDetails = new UserDetailsForToken(
+            1L,
+            "testuser",
+            List.of(new SimpleGrantedAuthority("ROLE_USER"))
+        );
+
+        UsernamePasswordAuthenticationToken authentication =
+            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+    
+    @Test
+    void registerTraining_Succeeds_WithValidInput() throws Exception {
+        String json = """
+            {
+                "trainingTime": "2025-07-27",
+                "trainingPlace": "競技場",
+                "trainingComments": "問題なし"
+            }
+            """;
+
+        when(trainingMapper.registerTraining(anyLong(), any(Date.class), anyString(), anyString()))
+                .thenReturn(1); // DB登録成功を模擬
+
+        mockMvc.perform(post("/api/register-training")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.result").value(1));
+    }
+    
+    @Test
+    void registerTraining_Fails_WhenTrainingTimeIsBlank() throws Exception {
+        String json = """
+        {
+            "trainingTime": "",
+            "trainingPlace": "陸上競技場",
+            "trainingComments": "調整練習"
+        }
+        """;
+
+        mockMvc.perform(post("/api/register-training")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").value("練習時間は必須です"));
+    }
+    
+    @Test
+    void registerTraining_Fails_WhenTrainingTimeFormatIsInvalid() throws Exception {
+        String json = """
+        {
+            "trainingTime": "25-07-27",
+            "trainingPlace": "陸上競技場",
+            "trainingComments": "試合に出場しました"
+        }
+        """;
+
+        mockMvc.perform(post("/api/register-training")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").value("練習時間はYYYY-MM-DDの形式で記述してください"));
+    }
+    
+    @Test
+    void registerTraining_Fails_WhenTrainingPlaceIsBlank() throws Exception {
+        String json = """
+        {
+            "trainingTime": "2025-07-27",
+            "trainingPlace": "",
+            "trainingComments": "調整練習"
+        }
+        """;
+
+        mockMvc.perform(post("/api/register-training")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").value("練習場所は必須です"));
+    }
+    
+    @Test
+    void registerTraining_Fails_WhenTrainingPlaceIsTooLong() throws Exception {
+        String tooLongPlace = "あ".repeat(65);
+        String json = String.format("""
+        {
+            "trainingTime": "2025-07-27",
+            "trainingPlace": "%s",
+            "trainingComments": "長すぎる場所名"
+        }
+        """, tooLongPlace);
+
+        mockMvc.perform(post("/api/register-training")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").value("練習場所は64文字以内で記入してください"));
+    }
+    
+    @Test
+    void registerTraining_Fails_WhenTrainingCommentsIsTooLong() throws Exception {
+        String tooLongComment = "あ".repeat(256);
+        String json = String.format("""
+        {
+            "trainingTime": "2025-07-27",
+            "trainingPlace": "陸上競技場",
+            "trainingComments": "%s"
+        }
+        """, tooLongComment);
+
+        mockMvc.perform(post("/api/register-training")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").value("練習コメントは255文字以内で記入してください"));
+    }
+}

@@ -101,6 +101,7 @@ dependencies {
 
     //テスト
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
 
     // テスト用にH2を追加
     testImplementation 'com.h2database:h2'
