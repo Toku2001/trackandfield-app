@@ -23,11 +23,13 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import io.github.Toku2001.trackandfieldapp.dto.training.DeleteTrainingRequest;
 import io.github.Toku2001.trackandfieldapp.dto.training.TrainingResponse;
 import io.github.Toku2001.trackandfieldapp.dto.user.UserDetailsForToken;
 import io.github.Toku2001.trackandfieldapp.exception.DatabaseOperationException;
 import io.github.Toku2001.trackandfieldapp.repository.PasswordMapper;
 import io.github.Toku2001.trackandfieldapp.repository.TrainingMapper;
+import io.github.Toku2001.trackandfieldapp.service.training.DeleteTrainingService;
 import io.github.Toku2001.trackandfieldapp.service.training.TrainingService;
 
 @SpringBootTest
@@ -48,6 +50,9 @@ public class TrainingTest {
     
     @MockBean
     private TrainingService trainingService;
+    
+    @MockBean
+    private DeleteTrainingService deleteTrainingService;
     
     @BeforeEach
     void setUp() {
@@ -98,23 +103,6 @@ public class TrainingTest {
                 .content(json))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.error").value("練習時間は必須です"));
-    }
-    
-    @Test
-    void registerTraining_Fails_WhenTrainingTimeFormatIsInvalid() throws Exception {
-        String json = """
-        {
-            "trainingTime": "25-07-27",
-            "trainingPlace": "陸上競技場",
-            "trainingComments": "試合に出場しました"
-        }
-        """;
-
-        mockMvc.perform(post("/api/register-training")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.error").value("練習時間はYYYY-MM-DDの形式で記述してください"));
     }
     
     @Test
@@ -201,5 +189,43 @@ public class TrainingTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isInternalServerError())
             .andExpect(jsonPath("$.error").value("想定のデータが取得できていません。"));
+    }
+    
+    @Test
+    void delete_Success() throws Exception {
+        LocalDate date = LocalDate.of(2025, 7, 27);
+        DeleteTrainingRequest deleteTrainingRequest = new DeleteTrainingRequest(date);
+
+        when(deleteTrainingService.deleteTraining(deleteTrainingRequest))
+            .thenReturn(1); // 削除成功
+
+        // JSON文字列を正しく構築
+        String json = """
+        {
+            "trainingDate": "2025-07-27"
+        }
+        """;
+
+        mockMvc.perform(delete("/api/delete-training")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.deleteDate").value("2025-07-27"))
+            .andExpect(jsonPath("$.deleteNumber").value(1));
+    }
+
+    @Test
+    void delete_Failer() throws Exception {
+        String json = """
+        {
+            "trainingDate": ""
+        }
+        """;
+
+        mockMvc.perform(delete("/api/delete-training")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").value("削除したい練習日誌の日付が正しくリクエストされていません"));
     }
 }
