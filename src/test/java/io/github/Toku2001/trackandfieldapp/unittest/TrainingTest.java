@@ -228,4 +228,51 @@ public class TrainingTest {
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.error").value("削除したい練習日誌の日付が正しくリクエストされていません"));
     }
+    
+    @Test
+    void update_Success() throws Exception {
+        LocalDate date = LocalDate.of(2025, 7, 27);
+        String updateTrainingPlace = "練習場所を変更";
+        String updateTrainingComments = "練習日誌を変更";
+//        ChangeTrainingRequest changeTrainingRequest = new ChangeTrainingRequest(date, updateTrainingPlace, updateTrainingComments);
+
+        when(trainingMapper.changeTraining(anyLong(), eq(date), eq(updateTrainingPlace), eq(updateTrainingComments)))
+            .thenReturn(1); // 削除成功
+
+        // JSON文字列を正しく構築
+        String json = """
+        {
+            "trainingTime": "2025-07-27",
+            "trainingPlace": "練習場所を変更",
+            "trainingComments": "練習日誌を変更"
+            
+        }
+        """;
+
+        mockMvc.perform(put("/api/change-training")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.trainingTime").value("2025-07-27"))
+            .andExpect(jsonPath("$.trainingPlace").value("練習場所を変更"))
+            .andExpect(jsonPath("$.trainingComments").value("練習日誌を変更"));
+    }
+
+    @Test
+    void update_Failer() throws Exception {
+    	String json = """
+    	{
+    	   "trainingTime": "",
+    	   "trainingPlace": "練習場所を変更",
+    	   "trainingComments": "練習日誌を変更"
+    	            
+    	}
+    	""";
+
+        mockMvc.perform(put("/api/change-training")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").value("更新したい練習日誌の日付が正しくリクエストされていません"));
+    }
 }
