@@ -1,7 +1,5 @@
 package io.github.Toku2001.trackandfieldapp.service.training.impl;
 
-import java.time.LocalDate;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -24,10 +22,8 @@ public class RegisterTrainingServiceImpl implements RegisterTrainingService{
     public int registerTraining(RegisterTrainingRequest request) {
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	    UserDetailsForToken userDetails = (UserDetailsForToken) authentication.getPrincipal();
-	    LocalDate localDate = LocalDate.parse(request.getTrainingTime());
-	    LocalDate today = LocalDate.now();
         int registerNumber = trainingMapper.registerTraining(userDetails.getUserId(),
-        													 today,
+        													 request.getTrainingTime(),
         													 request.getTrainingPlace(),
         													 request.getTrainingComments());
         if (registerNumber == 0) {
