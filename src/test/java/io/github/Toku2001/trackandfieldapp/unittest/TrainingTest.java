@@ -1,0 +1,278 @@
+package io.github.Toku2001.trackandfieldapp.unittest;
+
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+
+import io.github.Toku2001.trackandfieldapp.dto.training.DeleteTrainingRequest;
+import io.github.Toku2001.trackandfieldapp.dto.training.TrainingResponse;
+import io.github.Toku2001.trackandfieldapp.dto.user.UserDetailsForToken;
+import io.github.Toku2001.trackandfieldapp.exception.DatabaseOperationException;
+import io.github.Toku2001.trackandfieldapp.repository.PasswordMapper;
+import io.github.Toku2001.trackandfieldapp.repository.TrainingMapper;
+import io.github.Toku2001.trackandfieldapp.service.training.DeleteTrainingService;
+import io.github.Toku2001.trackandfieldapp.service.training.TrainingService;
+
+@SpringBootTest
+@AutoConfigureMockMvc  
+@WithMockUser(username = "testuser", roles = {"USER"})
+@Transactional
+@MapperScan("io.github.Toku2001.trackandfieldapp.repository") 
+public class TrainingTest {
+
+	@Autowired
+    private MockMvc mockMvc;
+
+	@MockBean
+    private TrainingMapper trainingMapper;
+
+    @MockBean
+    private PasswordMapper passwordMapper;
+    
+    @MockBean
+    private TrainingService trainingService;
+    
+    @MockBean
+    private DeleteTrainingService deleteTrainingService;
+    
+    @BeforeEach
+    void setUp() {
+        UserDetailsForToken userDetails = new UserDetailsForToken(
+            1L,
+            "testuser",
+            List.of(new SimpleGrantedAuthority("ROLE_USER"))
+        );
+
+        UsernamePasswordAuthenticationToken authentication =
+            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+    
+    @Test
+    void registerTraining_Succeeds_WithValidInput() throws Exception {
+        String json = """
+            {
+                "trainingTime": "2025-07-27",
+                "trainingPlace": "競技場",
+                "trainingComments": "問題なし"
+            }
+            """;
+
+        when(trainingMapper.registerTraining(anyLong(), any(LocalDate.class), anyString(), anyString()))
+                .thenReturn(1); // DB登録成功を模擬
+
+        mockMvc.perform(post("/api/register-training")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.result").value(1));
+    }
+    
+    @Test
+    void registerTraining_Fails_WhenTrainingTimeIsBlank() throws Exception {
+        String json = """
+        {
+            "trainingTime": "",
+            "trainingPlace": "陸上競技場",
+            "trainingComments": "調整練習"
+        }
+        """;
+
+        mockMvc.perform(post("/api/register-training")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").value("練習時間は必須です"));
+    }
+    
+    @Test
+    void registerTraining_Fails_WhenTrainingPlaceIsBlank() throws Exception {
+        String json = """
+        {
+            "trainingTime": "2025-07-27",
+            "trainingPlace": "",
+            "trainingComments": "調整練習"
+        }
+        """;
+
+        mockMvc.perform(post("/api/register-training")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").value("練習場所は必須です"));
+    }
+    
+    @Test
+    void registerTraining_Fails_WhenTrainingPlaceIsTooLong() throws Exception {
+        String tooLongPlace = "あ".repeat(65);
+        String json = String.format("""
+        {
+            "trainingTime": "2025-07-27",
+            "trainingPlace": "%s",
+            "trainingComments": "長すぎる場所名"
+        }
+        """, tooLongPlace);
+
+        mockMvc.perform(post("/api/register-training")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").value("練習場所は64文字以内で記入してください"));
+    }
+    
+    @Test
+    void registerTraining_Fails_WhenTrainingCommentsIsTooLong() throws Exception {
+        String tooLongComment = "あ".repeat(256);
+        String json = String.format("""
+        {
+            "trainingTime": "2025-07-27",
+            "trainingPlace": "陸上競技場",
+            "trainingComments": "%s"
+        }
+        """, tooLongComment);
+
+        mockMvc.perform(post("/api/register-training")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").value("練習コメントは255文字以内で記入してください"));
+    }
+    
+    void getTraining_Success() throws Exception {
+        LocalDate date = LocalDate.of(2025, 7, 27);
+
+        TrainingResponse mockResponse = new TrainingResponse();
+        mockResponse.setTrainingTime(date);
+        mockResponse.setTrainingPlace("競技場");
+        mockResponse.setTrainingComments("問題なし");
+
+        when(trainingService.getTraining(eq(date))).thenReturn(mockResponse);
+
+        mockMvc.perform(get("/api/get-training")
+                .param("trainingDate", date.toString())
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.trainingPlace").value("競技場"))
+            .andExpect(jsonPath("$.trainingComments").value("問題なし"))
+            .andExpect(jsonPath("$.trainingTime").value(date.toString()));
+    }
+    
+    @Test
+    void getTraining_Failure_WhenDataNotFound() throws Exception {
+        LocalDate date = LocalDate.of(2025, 7, 27);
+
+        when(trainingService.getTraining(eq(date)))
+            .thenThrow(new DatabaseOperationException("想定のデータが取得できていません。", null));
+
+        mockMvc.perform(get("/api/get-training")
+                .param("trainingDate", date.toString())
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isInternalServerError())
+            .andExpect(jsonPath("$.error").value("想定のデータが取得できていません。"));
+    }
+    
+    @Test
+    void delete_Success() throws Exception {
+        LocalDate date = LocalDate.of(2025, 7, 27);
+        DeleteTrainingRequest deleteTrainingRequest = new DeleteTrainingRequest(date);
+
+        when(deleteTrainingService.deleteTraining(deleteTrainingRequest))
+            .thenReturn(1); // 削除成功
+
+        // JSON文字列を正しく構築
+        String json = """
+        {
+            "trainingDate": "2025-07-27"
+        }
+        """;
+
+        mockMvc.perform(delete("/api/delete-training")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.deleteDate").value("2025-07-27"))
+            .andExpect(jsonPath("$.deleteNumber").value(1));
+    }
+
+    @Test
+    void delete_Failer() throws Exception {
+        String json = """
+        {
+            "trainingDate": ""
+        }
+        """;
+
+        mockMvc.perform(delete("/api/delete-training")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").value("削除したい練習日誌の日付が正しくリクエストされていません"));
+    }
+    
+    @Test
+    void update_Success() throws Exception {
+        LocalDate date = LocalDate.of(2025, 7, 27);
+        String updateTrainingPlace = "練習場所を変更";
+        String updateTrainingComments = "練習日誌を変更";
+//        ChangeTrainingRequest changeTrainingRequest = new ChangeTrainingRequest(date, updateTrainingPlace, updateTrainingComments);
+
+        when(trainingMapper.changeTraining(anyLong(), eq(date), eq(updateTrainingPlace), eq(updateTrainingComments)))
+            .thenReturn(1); // 削除成功
+
+        // JSON文字列を正しく構築
+        String json = """
+        {
+            "trainingTime": "2025-07-27",
+            "trainingPlace": "練習場所を変更",
+            "trainingComments": "練習日誌を変更"
+            
+        }
+        """;
+
+        mockMvc.perform(put("/api/change-training")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.trainingTime").value("2025-07-27"))
+            .andExpect(jsonPath("$.trainingPlace").value("練習場所を変更"))
+            .andExpect(jsonPath("$.trainingComments").value("練習日誌を変更"));
+    }
+
+    @Test
+    void update_Failer() throws Exception {
+    	String json = """
+    	{
+    	   "trainingTime": "",
+    	   "trainingPlace": "練習場所を変更",
+    	   "trainingComments": "練習日誌を変更"
+    	            
+    	}
+    	""";
+
+        mockMvc.perform(put("/api/change-training")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").value("更新したい練習日誌の日付が正しくリクエストされていません"));
+    }
+}

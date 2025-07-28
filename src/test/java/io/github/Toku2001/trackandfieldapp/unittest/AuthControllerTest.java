@@ -1,4 +1,4 @@
-package io.github.Toku2001.trackandfieldapp.controller;
+package io.github.Toku2001.trackandfieldapp.unittest;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -36,7 +36,7 @@ import io.github.Toku2001.trackandfieldapp.service.user.MailService;
 @AutoConfigureMockMvc
 @Transactional
 @MapperScan("io.github.Toku2001.trackandfieldapp.repository") 
-public class RegisterUserControllerTest {
+public class AuthControllerTest {
 
 	@Autowired
     private MockMvc mockMvc;
