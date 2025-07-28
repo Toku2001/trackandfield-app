@@ -1,4 +1,4 @@
-package io.github.Toku2001.trackandfieldapp.unittest;
+package io.github.Toku2001.trackandfieldapp.unittest.competition;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
