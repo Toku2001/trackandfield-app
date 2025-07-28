@@ -23,12 +23,12 @@
   </insert>
 
   <!-- 日付で大会情報を取得 -->
-  <!-- <select id="getCompetitionByDate" resultType="io.github.Toku2001.trackandfieldapp.entity.Competition_Info">
+  <select id="getCompetitionByDate" resultType="io.github.Toku2001.trackandfieldapp.entity.Competition_Info">
     SELECT competition_name, competition_place, competition_time, competition_comments
     FROM competitions
     WHERE user_id = #{userId}
       AND competition_time = #{competitionTime}
-  </select> -->
+  </select>
 
   <!-- ユーザーIDで大会情報を取得 -->
   <!-- <select id="getCompetitionsByUserId" resultType="io.github.Toku2001.trackandfieldapp.entity.Competition_Info">
@@ -39,13 +39,13 @@
   </select> -->
   
   <!-- 近日中に開催する競技会情報を取得 -->
-  <!-- <select id="getNextCompetition" resultType="io.github.Toku2001.trackandfieldapp.entity.Competition_Info">
+  <select id="getNextCompetition" resultType="io.github.Toku2001.trackandfieldapp.entity.Competition_Info">
     SELECT *
 	FROM competitions
 	WHERE competition_time::date >= CURRENT_DATE
 	ORDER BY competition_time ASC
 	LIMIT 1;
-  </select> -->
+  </select>
 
   <!-- 大会情報の更新 -->
   <update id="changeCompetition">

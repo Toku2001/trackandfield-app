@@ -21,10 +21,10 @@ public interface CompetitionMapper {
     );
 
     // 日付で大会情報を取得
-    // Competition_Info getCompetitionByDate(
-    //     @Param("userId") long userId,
-    //     @Param("competitionTime") LocalDate competitionTime
-    // );
+    Competition_Info getCompetitionByDate(
+        @Param("userId") long userId,
+        @Param("competitionTime") LocalDate competitionTime
+    );
 
     // ユーザーIDで大会情報をすべて取得
     // List<Competition_Info> getCompetitionsByUserId(
@@ -32,7 +32,7 @@ public interface CompetitionMapper {
     // );
     
     // 近日開催の競技会情報を取得
-    // Competition_Info getNextCompetition();
+    Competition_Info getNextCompetition();
 
     // 大会情報の更新（日時とユーザーIDで対象を特定）
     int changeCompetition(
