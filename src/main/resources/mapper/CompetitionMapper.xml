@@ -59,11 +59,11 @@
   </update>
 
   <!-- 大会情報の削除 -->
-  <!-- <delete id="deleteCompetition">
+  <delete id="deleteCompetition">
     DELETE FROM competitions
     WHERE user_id = #{userId}
       AND competition_time = #{competitionTime}
-  </delete> -->
+  </delete>
 
   <!-- 全大会情報の取得 -->
   <!-- <select id="getAllCompetitions" resultType="io.github.Toku2001.trackandfieldapp.entity.Competition_Info">

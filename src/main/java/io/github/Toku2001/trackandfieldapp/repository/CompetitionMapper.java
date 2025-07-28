@@ -44,10 +44,10 @@ public interface CompetitionMapper {
     );
 
     // 大会情報の削除
-    // int deleteCompetition(
-    //     @Param("userId") long userId,
-    //     @Param("competitionTime") LocalDate competitionTime
-    // );
+    int deleteCompetition(
+        @Param("userId") long userId,
+        @Param("competitionTime") LocalDate competitionTime
+    );
 
     // 全ての大会情報を取得（管理者向け想定）
     // List<Competition_Info> getAllCompetitions();

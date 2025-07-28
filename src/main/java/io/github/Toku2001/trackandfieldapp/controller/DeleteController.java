@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import io.github.Toku2001.trackandfieldapp.dto.competition.DeleteCompetitionRequest;
 import io.github.Toku2001.trackandfieldapp.dto.training.DeleteTrainingRequest;
 import io.github.Toku2001.trackandfieldapp.dto.training.DeleteTrainingResponse;
+import io.github.Toku2001.trackandfieldapp.service.competition.DeleteCompetitionService;
 import io.github.Toku2001.trackandfieldapp.service.training.DeleteTrainingService;
 import lombok.RequiredArgsConstructor;
 
@@ -23,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DeleteController {
 	private final DeleteTrainingService deleteTrainingService;
+	private final DeleteCompetitionService deleteCompetitionService;
     
     @DeleteMapping("/delete-training")
     public ResponseEntity<?> deleteTraining(@Valid @RequestBody DeleteTrainingRequest request, BindingResult bindingResult){
@@ -36,6 +39,17 @@ public class DeleteController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
         }
         return ResponseEntity.ok(new DeleteTrainingResponse(request.getTrainingDate(), deleteTrainingNumber));
+    	}
+    }
+    
+    @DeleteMapping("/delete-competition")
+    public int deleteCompetition(@RequestBody DeleteCompetitionRequest request){
+    	int deleteCompetitionNumber = deleteCompetitionService.deleteCompetition(request); {
+        if (deleteCompetitionNumber == 0) {
+            System.out.println("deleteCompetition failed: training not found");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+        }
+        return deleteCompetitionNumber;
     	}
     }
 }
