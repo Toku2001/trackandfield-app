@@ -58,7 +58,8 @@ jobs:
 
       - name: Run tests and generate coverage report
         run: |
-          ./gradlew clean test --tests "io.github.Toku2001.trackandfieldapp.unittest.competition.*"
+          ./gradlew clean test --tests "io.github.Toku2001.trackandfieldapp.unittest.competition.CompetitionControllerTest"
+          ./gradlew test --tests "io.github.Toku2001.trackandfieldapp.unittest.competition.CompetitionServiceImplTest"
           ./gradlew jacocoTestReport
         env:
           POSTGRES_DB: ${{ secrets.DB_NAME }}
