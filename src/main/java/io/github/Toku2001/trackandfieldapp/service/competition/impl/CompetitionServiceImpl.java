@@ -44,7 +44,7 @@ public class CompetitionServiceImpl implements CompetitionService{
 	public CompetitionResponse getNextCompetition() {
 		Competition_Info competition_Info = competitionMapper.getNextCompetition();
         if (competition_Info == null) {
-            return new CompetitionResponse();
+        	throw new DatabaseOperationException("想定のデータが取得できていません。", new Exception());
         }
         CompetitionResponse competitionResponse = new CompetitionResponse();
         competitionResponse.setCompetitionName(competition_Info.getCompetition_Name());
