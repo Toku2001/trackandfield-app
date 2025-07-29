@@ -166,6 +166,20 @@ class CompetitionServiceImplTest {
         assertEquals(1, deleteResult);
     }
     
+    @Test
+    void deleteCompetition_mapperReturnsZero_shouldThrowDatabaseOperationException() {
+        setAuthentication(new UserDetailsForToken(1L, "testuser", List.of()));
+
+        DeleteCompetitionRequest deleteRequest = new DeleteCompetitionRequest(LocalDate.of(2025, 7, 27));
+        when(mapper.deleteCompetition(
+            anyLong(),
+            any(LocalDate.class)))
+        .thenReturn(0);
+
+        Exception ex = assertThrows(DatabaseOperationException.class, () -> deleteService.deleteCompetition(deleteRequest));
+        assertEquals("正しく競技会情報が削除されませんでした", ex.getMessage());
+    }
+    
     //競技会情報更新
     @Test
     void updateCompetition_shouldReturnChangeNumber() {
@@ -182,6 +196,23 @@ class CompetitionServiceImplTest {
 
         int changeResult = changeService.changeCompetition(changeRequest);
         assertEquals(1, changeResult);
+    }
+    
+    @Test
+    void updateCompetition_mapperReturnsZero_shouldReturnChangeNumber() {
+        setAuthentication(new UserDetailsForToken(1L, "testuser", List.of()));
+
+        ChangeCompetitionRequest changeRequest = changeValidRequest();
+        when(mapper.changeCompetition(
+                anyLong(),
+                anyString(),
+                anyString(),
+                any(LocalDate.class),
+                anyString()))
+            .thenReturn(0);
+
+        Exception ex = assertThrows(DatabaseOperationException.class, () -> changeService.changeCompetition(changeRequest));
+        assertEquals("競技会情報の更新件数が0件です。", ex.getMessage());
     }
     
     //競技会情報取得
@@ -211,5 +242,33 @@ class CompetitionServiceImplTest {
 
         CompetitionResponse getResult = competitionService.getCompetitionByDate(LocalDate.of(2025, 7, 27));
         assertEquals(competitionResponse, getResult);
+    }
+    
+    @Test
+    void getCompetition_mapperReturnsNull_shouldReturnCompetitionInfo() {
+        setAuthentication(new UserDetailsForToken(1L, "testuser", List.of()));
+        
+        // モックが返すレスポンスを定義
+        Competition_Info mockResponse = new Competition_Info();
+        mockResponse.setCompetition_Id(1L);
+        mockResponse.setUser_Id(1L);
+        mockResponse.setCompetition_Name("大会名");
+        mockResponse.setCompetition_Place("場所");
+        mockResponse.setCompetition_Time(LocalDate.of(2025, 7, 27));
+        mockResponse.setCompetition_Comments("コメント");
+        
+        CompetitionResponse competitionResponse = new CompetitionResponse();
+        competitionResponse.setCompetitionName("大会名");
+        competitionResponse.setCompetitionPlace("場所");
+        competitionResponse.setCompetitionTime(LocalDate.of(2025, 7, 27));
+        competitionResponse.setCompetitionComments("コメント");
+
+        when(mapper.getCompetitionByDate(
+                anyLong(),
+                any(LocalDate.class)))
+            .thenReturn(null);
+
+        Exception ex = assertThrows(DatabaseOperationException.class, () -> competitionService.getCompetitionByDate(LocalDate.of(2025, 7, 27)));
+        assertEquals("想定のデータが取得できていません。", ex.getMessage());
     }
 }
