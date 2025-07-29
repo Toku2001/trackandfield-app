@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.github.Toku2001.trackandfieldapp.repository.CompetitionMapper">
+
+  <!-- 大会情報の登録 -->
+  <insert id="registerCompetition">
+    INSERT INTO competitions (
+      user_id,
+      competition_name,
+      competition_place,
+      competition_time,
+      competition_comments
+    ) VALUES (
+      #{userId},
+      #{competitionName},
+      #{competitionPlace},
+      #{competitionTime},
+      #{competitionComments}
+    )
+  </insert>
+
+  <!-- 日付で大会情報を取得 -->
+  <select id="getCompetitionByDate" resultType="io.github.Toku2001.trackandfieldapp.entity.Competition_Info">
+    SELECT competition_name, competition_place, competition_time, competition_comments
+    FROM competitions
+    WHERE user_id = #{userId}
+      AND competition_time = #{competitionTime}
+  </select>
+
+  <!-- ユーザーIDで大会情報を取得 -->
+  <!-- <select id="getCompetitionsByUserId" resultType="io.github.Toku2001.trackandfieldapp.entity.Competition_Info">
+    SELECT *
+    FROM competitions
+    WHERE user_id = #{userId}
+    ORDER BY competition_time DESC
+  </select> -->
+  
+  <!-- 近日中に開催する競技会情報を取得 -->
+  <select id="getNextCompetition" resultType="io.github.Toku2001.trackandfieldapp.entity.Competition_Info">
+    SELECT *
+	FROM competitions
+	WHERE competition_time::date >= CURRENT_DATE
+	ORDER BY competition_time ASC
+	LIMIT 1;
+  </select>
+
+  <!-- 大会情報の更新 -->
+  <update id="changeCompetition">
+    UPDATE competitions
+    SET
+      competition_name = #{competitionName},
+      competition_place = #{competitionPlace},
+      competition_comments = #{competitionComments}
+    WHERE user_id = #{userId}
+      AND competition_time = #{competitionTime}
+  </update>
+
+  <!-- 大会情報の削除 -->
+  <delete id="deleteCompetition">
+    DELETE FROM competitions
+    WHERE user_id = #{userId}
+      AND competition_time = #{competitionTime}
+  </delete>
+
+  <!-- 全大会情報の取得 -->
+  <!-- <select id="getAllCompetitions" resultType="io.github.Toku2001.trackandfieldapp.entity.Competition_Info">
+    SELECT *
+    FROM competitions
+    ORDER BY competition_time DESC
+  </select> -->
+
+</mapper>

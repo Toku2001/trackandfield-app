@@ -5,16 +5,16 @@ import java.util.Map;
 
 import jakarta.validation.Valid;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
+import io.github.Toku2001.trackandfieldapp.dto.competition.RegisterCompetitionRequest;
 import io.github.Toku2001.trackandfieldapp.dto.training.RegisterTrainingRequest;
+import io.github.Toku2001.trackandfieldapp.service.competition.RegisterCompetitionService;
 import io.github.Toku2001.trackandfieldapp.service.training.RegisterTrainingService;
 import lombok.RequiredArgsConstructor;
 
@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RegisterController {
 	private final RegisterTrainingService registerTrainingService;
+	private final RegisterCompetitionService registerCompetitionService;
 	
 	@PostMapping("/register-training")
 	public ResponseEntity<Map<String, Object>> registerTraining(@Valid @RequestBody RegisterTrainingRequest request, BindingResult bindingResult) {
@@ -32,12 +33,19 @@ public class RegisterController {
             return ResponseEntity.badRequest().body(Map.of("error", errorMsg));
         }
 		int registerNumber = registerTrainingService.registerTraining(request);
-		if(registerNumber == 0) {
-			System.out.println("RegisterUser failed: 練習日誌登録が正常に完了しませんでした");
-			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
-		}
 		Map<String, Object> response = new HashMap<>();
     	response.put("result", registerNumber);
 		return ResponseEntity.ok(response);
+	}
+	
+	@PostMapping("/register-competition")
+	public  ResponseEntity<?> registerCompetition(@Valid @RequestBody RegisterCompetitionRequest request, BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+            // 最初のエラーメッセージを取得して返す例
+            String errorMsg = bindingResult.getAllErrors().get(0).getDefaultMessage();
+            return ResponseEntity.badRequest().body(Map.of("error", errorMsg));
+        }
+		int registerCompetitionNumber = registerCompetitionService.registerCompetition(request);
+		return ResponseEntity.ok(registerCompetitionNumber);
 	}
 }

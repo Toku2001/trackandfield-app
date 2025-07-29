@@ -33,14 +33,11 @@ jacocoTestReport {
         classDirectories.setFrom(
             files(classDirectories.files.collect {
                 fileTree(dir: it, exclude: [
-                    '**/TrackAndFieldAppApplication.class',  // 起動クラス
-                    '**/dto/**',                // DTO全体
-                    '**/entity/**',             // エンティティ全体
-                    '**/exception/**',          // 例外系
-                    '**/authentication/**' ,    // トークン処理
-                    '**/TrainingService*',      // 練習日誌取得
-                    '**/DeleteTrainingService*',// 練習日誌削除
-                    '**/ReadController*'        // 練習日誌取得のコントローラ
+                    '**/TrackAndFieldAppApplication.class',  		// 起動クラス
+                    '**/dto/**',                					// DTO全体
+                    '**/entity/**',             					// エンティティ全体
+                    '**/exception/**',          					// 例外系
+                    '**/authentication/**'	     					// トークン処理
                 ])
             })
         )

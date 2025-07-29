@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import io.github.Toku2001.trackandfieldapp.dto.competition.ChangeCompetitionRequest;
 import io.github.Toku2001.trackandfieldapp.dto.training.ChangeTrainingRequest;
 import io.github.Toku2001.trackandfieldapp.dto.training.ChangeTrainingResponse;
+import io.github.Toku2001.trackandfieldapp.service.competition.ChangeCompetitionService;
 import io.github.Toku2001.trackandfieldapp.service.training.ChangeTrainingService;
 import lombok.RequiredArgsConstructor;
 
@@ -23,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ChangeController {
     private final ChangeTrainingService changeTrainingSerivice;
+    private final ChangeCompetitionService changeCompetitionService;
     
     @PutMapping("/change-training")
     public ResponseEntity<?> changeTraining(@Valid @RequestBody ChangeTrainingRequest request, BindingResult bindingResult){
@@ -36,5 +39,15 @@ public class ChangeController {
         	throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
 		}
         return ResponseEntity.ok(new ChangeTrainingResponse(request.getTrainingTime(), request.getTrainingPlace(), request.getTrainingComments()));
+    }
+    
+    @PutMapping("/change-competition")
+    public int changeCompetition(@RequestBody ChangeCompetitionRequest request){
+        int changeCompetitionNumber = changeCompetitionService.changeCompetition(request);
+        if(changeCompetitionNumber == 0) {
+			System.out.println("RegisterCompetition failed: 競技会情報の変更が正常に完了しませんでした");
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid credentials");
+		}
+        return changeCompetitionNumber;
     }
 }
