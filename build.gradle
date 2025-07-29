@@ -40,7 +40,7 @@ jacocoTestReport {
                     '**/authentication/**',     					// トークン処理
                     '**/CompetitionServiceImpl.class',     			// 競技会情報取得
                     '**/ChangeCompetitionServiceImpl.class',     	// 競技会情報更新
-                    '**/deleteCompetition.class'     				// 競技会情報削除
+                    '**/deleteCompetitionServiceImpl.class'     	// 競技会情報削除
                 ])
             })
         )

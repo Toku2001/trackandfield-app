@@ -33,7 +33,7 @@ import io.github.Toku2001.trackandfieldapp.service.competition.impl.RegisterComp
 @MapperScan("io.github.Toku2001.trackandfieldapp.repository") 
 class CompetitionServiceImplTest {
 
-    @InjectMocks
+	@InjectMocks
     private RegisterCompetitionServiceImpl service;
 
     @Mock
