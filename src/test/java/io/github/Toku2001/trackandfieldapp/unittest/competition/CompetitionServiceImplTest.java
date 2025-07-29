@@ -20,10 +20,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
+import io.github.Toku2001.trackandfieldapp.dto.competition.ChangeCompetitionRequest;
+import io.github.Toku2001.trackandfieldapp.dto.competition.CompetitionResponse;
+import io.github.Toku2001.trackandfieldapp.dto.competition.DeleteCompetitionRequest;
 import io.github.Toku2001.trackandfieldapp.dto.competition.RegisterCompetitionRequest;
 import io.github.Toku2001.trackandfieldapp.dto.user.UserDetailsForToken;
+import io.github.Toku2001.trackandfieldapp.entity.Competition_Info;
 import io.github.Toku2001.trackandfieldapp.exception.DatabaseOperationException;
 import io.github.Toku2001.trackandfieldapp.repository.CompetitionMapper;
+import io.github.Toku2001.trackandfieldapp.service.competition.impl.ChangeCompetitionServiceImpl;
+import io.github.Toku2001.trackandfieldapp.service.competition.impl.CompetitionServiceImpl;
+import io.github.Toku2001.trackandfieldapp.service.competition.impl.DeleteCompetitionServiceImpl;
 import io.github.Toku2001.trackandfieldapp.service.competition.impl.RegisterCompetitionServiceImpl;
 
 @SpringBootTest
@@ -34,13 +41,31 @@ import io.github.Toku2001.trackandfieldapp.service.competition.impl.RegisterComp
 class CompetitionServiceImplTest {
 
 	@InjectMocks
-    private RegisterCompetitionServiceImpl service;
+    private RegisterCompetitionServiceImpl registerService;
+	
+	@InjectMocks
+    private DeleteCompetitionServiceImpl deleteService;
+	
+	@InjectMocks
+    private ChangeCompetitionServiceImpl changeService;
+	
+	@InjectMocks
+    private CompetitionServiceImpl competitionService;
 
     @Mock
     private CompetitionMapper mapper;
 
     private RegisterCompetitionRequest createValidRequest() {
         return new RegisterCompetitionRequest(
+            "大会名",
+            "競技場",
+            LocalDate.of(2025, 7, 27),
+            "コメント"
+        );
+    }
+    
+    private ChangeCompetitionRequest changeValidRequest() {
+        return new ChangeCompetitionRequest(
             "大会名",
             "競技場",
             LocalDate.of(2025, 7, 27),
@@ -58,6 +83,7 @@ class CompetitionServiceImplTest {
         SecurityContextHolder.clearContext();
     }
 
+    //競技会情報登録
     @Test
     void registerCompetition_validRequest_shouldReturnRegisterNumber() {
         setAuthentication(new UserDetailsForToken(1L, "testuser", List.of()));
@@ -71,7 +97,7 @@ class CompetitionServiceImplTest {
             anyString()))
         .thenReturn(1);
 
-        int result = service.registerCompetition(request);
+        int result = registerService.registerCompetition(request);
         assertEquals(1, result);
     }
     
@@ -80,7 +106,7 @@ class CompetitionServiceImplTest {
         RegisterCompetitionRequest request = createValidRequest();
         SecurityContextHolder.clearContext();
 
-        assertThrows(NullPointerException.class, () -> service.registerCompetition(request));
+        assertThrows(NullPointerException.class, () -> registerService.registerCompetition(request));
     }
 
     @Test
@@ -89,7 +115,7 @@ class CompetitionServiceImplTest {
 
         RegisterCompetitionRequest request = createValidRequest();
 
-        assertThrows(ClassCastException.class, () -> service.registerCompetition(request));
+        assertThrows(ClassCastException.class, () -> registerService.registerCompetition(request));
     }
 
     @Test
@@ -105,7 +131,7 @@ class CompetitionServiceImplTest {
             anyString()))
         .thenReturn(0);
 
-        Exception ex = assertThrows(DatabaseOperationException.class, () -> service.registerCompetition(request));
+        Exception ex = assertThrows(DatabaseOperationException.class, () -> registerService.registerCompetition(request));
         assertEquals("練習日誌を登録できませんでした", ex.getMessage());
     }
 
@@ -122,6 +148,68 @@ class CompetitionServiceImplTest {
             anyString()))
         .thenThrow(new RuntimeException("DBエラー"));
 
-        assertThrows(RuntimeException.class, () -> service.registerCompetition(request));
+        assertThrows(RuntimeException.class, () -> registerService.registerCompetition(request));
+    }
+
+    //競技会情報削除
+    @Test
+    void deleteCompetition_validRequest_shouldReturnRegisterNumber() {
+        setAuthentication(new UserDetailsForToken(1L, "testuser", List.of()));
+
+        DeleteCompetitionRequest deleteRequest = new DeleteCompetitionRequest(LocalDate.of(2025, 7, 27));
+        when(mapper.deleteCompetition(
+            anyLong(),
+            any(LocalDate.class)))
+        .thenReturn(1);
+
+        int deleteResult = deleteService.deleteCompetition(deleteRequest);
+        assertEquals(1, deleteResult);
+    }
+    
+    //競技会情報更新
+    @Test
+    void updateCompetition_shouldReturnChangeNumber() {
+        setAuthentication(new UserDetailsForToken(1L, "testuser", List.of()));
+
+        ChangeCompetitionRequest changeRequest = changeValidRequest();
+        when(mapper.changeCompetition(
+                anyLong(),
+                anyString(),
+                anyString(),
+                any(LocalDate.class),
+                anyString()))
+            .thenReturn(1);
+
+        int changeResult = changeService.changeCompetition(changeRequest);
+        assertEquals(1, changeResult);
+    }
+    
+    //競技会情報取得
+    @Test
+    void getCompetition_shouldReturnCompetitionInfo() {
+        setAuthentication(new UserDetailsForToken(1L, "testuser", List.of()));
+        
+        // モックが返すレスポンスを定義
+        Competition_Info mockResponse = new Competition_Info();
+        mockResponse.setCompetition_Id(1L);
+        mockResponse.setUser_Id(1L);
+        mockResponse.setCompetition_Name("大会名");
+        mockResponse.setCompetition_Place("場所");
+        mockResponse.setCompetition_Time(LocalDate.of(2025, 7, 27));
+        mockResponse.setCompetition_Comments("コメント");
+        
+        CompetitionResponse competitionResponse = new CompetitionResponse();
+        competitionResponse.setCompetitionName("大会名");
+        competitionResponse.setCompetitionPlace("場所");
+        competitionResponse.setCompetitionTime(LocalDate.of(2025, 7, 27));
+        competitionResponse.setCompetitionComments("コメント");
+
+        when(mapper.getCompetitionByDate(
+                anyLong(),
+                any(LocalDate.class)))
+            .thenReturn(mockResponse);
+
+        CompetitionResponse getResult = competitionService.getCompetitionByDate(LocalDate.of(2025, 7, 27));
+        assertEquals(competitionResponse, getResult);
     }
 }

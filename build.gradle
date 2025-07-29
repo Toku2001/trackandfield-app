@@ -37,10 +37,7 @@ jacocoTestReport {
                     '**/dto/**',                					// DTO全体
                     '**/entity/**',             					// エンティティ全体
                     '**/exception/**',          					// 例外系
-                    '**/authentication/**',     					// トークン処理
-                    '**/CompetitionServiceImpl.class',     			// 競技会情報取得
-                    '**/ChangeCompetitionServiceImpl.class',     	// 競技会情報更新
-                    '**/DeleteCompetitionServiceImpl.class'     	// 競技会情報削除
+                    '**/authentication/**'	     					// トークン処理
                 ])
             })
         )
