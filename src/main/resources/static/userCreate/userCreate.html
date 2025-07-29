@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>新規登録</title>
+    <link rel="stylesheet" href="userCreate.css" />
+</head>
+<body>
+    <div class="login-container">
+        <h1>新規登録</h1>
+        <form id="registerForm">
+            <p>ユーザー名</p>
+            <input type="text" id="regUserName" name="username" class="textbox" placeholder="ユーザー名を入力" required />
+            
+            <p>メールアドレス</p>
+            <input type="email" id="regEmail" name="email" class="textbox" placeholder="メールアドレスを入力" required />
+            
+            <p>パスワード</p>
+            <input type="password" id="password" name="password" class="textbox" placeholder="パスワードを入力" required />
+            
+            <p>パスワード確認</p>
+            <input type="password" id="rePassword" name="passwordConfirm" class="textbox" placeholder="パスワードを再入力" required />
+            <label><input type="checkbox" id="showpassword" onchange="showOrHide()" /> パスワード表示</label>
+            
+            <button type="submit" id="registerSubmit">登録</button>
+        </form>
+        <button id="backToLogin" type="button">ログイン画面に戻る</button>
+    </div>
+
+	<script src="/config.js"></script>
+    <script src="userCreate.js"></script>
+</body>
+</html>
