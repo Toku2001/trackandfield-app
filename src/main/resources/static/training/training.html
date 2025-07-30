@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>練習日誌入力</title>
+  <link rel="stylesheet" href="training.css" />
+</head>
+<body>
+  <form id="trainingForm">
+    <h1>練習日誌の入力</h1>
+
+    <!-- 練習日（デフォルトは今日） -->
+    <label for="training-datetime">練習日時:</label>
+    <input type="date" id="training-datetime" name="training-datetime" required>
+
+    <!-- 練習時間 -->
+    <label for="training-time">練習時間:</label>
+    <div class="form-group">
+      <select id="training-hour">
+        <!-- JavaScriptで0〜23時を挿入 -->
+      </select>
+      時
+      <select id="training-minute">
+        <option value="00">00</option>
+        <option value="15">15</option>
+        <option value="30">30</option>
+        <option value="45">45</option>
+      </select>
+      分
+    </div>
+
+    <!-- 練習場所 -->
+    <label for="training-place">練習場所:</label>
+    <input type="text" id="training-place" name="training-place" required />
+
+    <!-- 練習内容 -->
+    <label for="training-content">練習内容:</label>
+    <textarea id="training-content" name="training-content" rows="5" required></textarea>
+
+    <div class="button-group">
+      <button type="button" onclick="cancel()">キャンセル</button>
+      <button type="button" onclick="saveTraining()">保存</button>
+      <button type="button" onclick="createJump()">跳躍内容を記入</button>
+    </div>
+  </form>
+
+  <script src="training.js"></script>
+  <script src="/config.js"></script>
+</body>
+</html>
