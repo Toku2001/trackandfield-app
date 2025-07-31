@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>競技会情報</title>
+  <link rel="stylesheet" href="tournament.css" />
+</head>
+<body>
+  <form id="competitionForm">
+    <h1>競技会情報</h1>
+
+    <label for="tournament-name">大会名:</label>
+    <input type="text" id="tournament-name" name="tournament-name" required />
+
+    <div class="form-group">
+      <label for="year">年:</label>
+      <select id="year"></select>
+
+      <label for="month">月:</label>
+      <select id="month"></select>
+
+      <label for="day">日:</label>
+      <select id="day"></select>
+    </div>
+
+    <label for="tournament-place">場所:</label>
+    <input type="text" id="tournament-place" name="tournament-place" required />
+	
+	<label for="tournament-comments">競技会コメント:</label>
+	<input type="text" id="tournament-comments" name="tournament-comments" />
+
+    <!-- <div id="eventsList"></div>
+    <button type="button" id="addEventBtn">種目を追加</button> -->
+
+    <div class="button-group">
+      <button type="button" onclick="cancel()">キャンセル</button>
+      <button type="button" onclick="saveTournament()">保存</button>
+      <button type="button" onclick="createJump()">跳躍内容を記入</button>
+    </div>
+  </form>
+
+  <script src="tournament.js"></script>
+  <script src="/config.js"></script>
+</body>
+</html>
