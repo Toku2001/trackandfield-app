@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>競技会・練習日誌</title>
+    <link rel="stylesheet" href="daily.css">
+</head>
+<body>
+
+    <h1>競技会</h1>
+    <table border="1">
+        <tr>
+            <th>大会名</th>
+            <td id="tournament-name"></td>
+        </tr>
+        <tr>
+            <th>日付</th>
+            <td id="tournament-time"></td>
+        </tr>
+        <tr>
+            <th>場所</th>
+            <td id="tournament-place"></td>
+        </tr>
+		<tr>
+		    <th>コメント</th>
+		    <td id="tournament-comments"></td>
+		</tr>
+    </table>
+
+    <h1>競技結果</h2>
+    <table border="1">
+        <tr>
+            <th>種目</th>
+            <td id="event-name1"></td>
+        </tr>
+        <tr>
+            <th>記録</th>
+            <td id="event-result1"></td>
+        </tr>
+        <tr>
+            <th>日付</th>
+            <td id="event-time1"></td>
+        </tr>
+    </table>
+
+    <h1>練習日誌</h1>
+    <table border="1">
+        <tr>
+            <th>練習時間</th>
+            <td id="training-time"></td>
+        </tr>
+        <tr>
+            <th>練習場所</th>
+            <td id="training-place"></td>
+        </tr>
+        <tr>
+            <th>練習内容</th>
+            <td id="training-comments"></td>
+        </tr>
+    </table>
+
+    <button onclick=goToHome()>マイページに戻る</button>
+    <button onclick=goToEdit()>編集する</button>
+
+    <script src="daily.js"></script>
+    <script src="/config.js"></script>
+</body>
+</html>
