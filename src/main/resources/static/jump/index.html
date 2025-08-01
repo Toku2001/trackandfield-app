@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>跳躍記録登録</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>跳躍記録 登録フォーム</h1>
+  </header>
+
+  <main>
+    <!-- 種目 -->
+    <label for="event">種目</label>
+    <select id="event">
+      <option value="long_jump">走幅跳</option>
+      <option value="triple_jump">三段跳</option>
+      <option value="pole_vault">棒高跳</option>
+    </select>
+
+    <!-- 記録 -->
+    <label for="distance">記録</label>
+    <select id="distance">
+      <option value="">選択してください</option>
+    </select>
+
+    <!-- 助走距離 -->
+    <label for="approach">助走距離（歩）</label>
+    <select id="approach">
+      <option value="">選択してください</option>
+    </select>
+
+    <!-- ポールサイズ -->
+	<!-- ポールの長さ -->
+	<div id="pole-feat-div" style="display: none;">
+	  <label for="pole-feat">ポール(長さ)</label>
+	  <select id="pole-feat">
+	    <option value="">選択してください</option>
+	  </select>
+	</div>
+
+	<!-- ポールの硬さ -->
+	<div id="pole-pond-div" style="display: none;">
+	  <label for="pole-pond">ポール(硬さ)</label>
+	  <select id="pole-pond">
+	    <option value="">選択してください</option>
+	  </select>
+	</div>
+
+    <section class="button-group">
+      <button onclick="submitAllJumpRecords()">登録</button>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
