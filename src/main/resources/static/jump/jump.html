@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>跳躍記録登録</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="jump.css" />
 </head>
 <body>
   <header>
@@ -12,48 +12,29 @@
   </header>
 
   <main>
-    <!-- 種目 -->
-    <label for="event">種目</label>
-    <select id="event">
-      <option value="long_jump">走幅跳</option>
-      <option value="triple_jump">三段跳</option>
-      <option value="pole_vault">棒高跳</option>
-    </select>
+	<div class="common-fields">
+	  <label for="jumpDate">日付</label>
+	  <input type="date" id="jumpDate" required>
 
-    <!-- 記録 -->
-    <label for="distance">記録</label>
-    <select id="distance">
-      <option value="">選択してください</option>
-    </select>
-
-    <!-- 助走距離 -->
-    <label for="approach">助走距離（歩）</label>
-    <select id="approach">
-      <option value="">選択してください</option>
-    </select>
-
-    <!-- ポールサイズ -->
-	<!-- ポールの長さ -->
-	<div id="pole-feat-div" style="display: none;">
-	  <label for="pole-feat">ポール(長さ)</label>
-	  <select id="pole-feat">
-	    <option value="">選択してください</option>
+	  <label for="recordType">記録種別</label>
+	  <select id="recordType" required>
+	    <option value="training">練習</option>
+	    <option value="official">競技会</option>
 	  </select>
 	</div>
+	
+    <div id="record-container">
+      <!-- 最初の記録ブロック -->
+    </div>
 
-	<!-- ポールの硬さ -->
-	<div id="pole-pond-div" style="display: none;">
-	  <label for="pole-pond">ポール(硬さ)</label>
-	  <select id="pole-pond">
-	    <option value="">選択してください</option>
-	  </select>
-	</div>
-
-    <section class="button-group">
+    <div class="button-group">
+      <button id="addRecordBtn">記録を追加</button>
       <button onclick="submitAllJumpRecords()">登録</button>
-    </section>
+	  <button onclick="cancel()">キャンセル</button>
+    </div>
   </main>
 
-  <script src="script.js"></script>
+  <script src="/config.js"></script>
+  <script src="jump.js"></script>
 </body>
 </html>
