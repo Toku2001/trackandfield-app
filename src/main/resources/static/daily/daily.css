@@ -117,3 +117,16 @@ textarea {
   background-color: #fff;
   resize: vertical; /* textareaのリサイズを縦方向のみに制限 */
 }
+
+#jump-records table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1em;
+  font-size: 0.95em;
+}
+
+#jump-records th, #jump-records td {
+  border: 1px solid #999;
+  padding: 6px 10px;
+  text-align: center;
+}
