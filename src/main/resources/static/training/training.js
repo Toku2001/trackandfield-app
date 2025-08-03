@@ -1,14 +1,15 @@
 document.addEventListener("DOMContentLoaded", function () {
-  formatted = new Date().toISOString().slice(0,10);
+  const formatted = new Date().toISOString().slice(0, 10);
   document.getElementById("training-datetime").value = formatted;
+
   const fromPage = sessionStorage.getItem("fromPage"); // "training" or "tournament"
 
-	document.getElementById("training-hour").value = sessionStorage.getItem("hour");
-	document.getElementById("training-minute").value = sessionStorage.getItem("minute");
-	document.getElementById("training-place").value = sessionStorage.getItem("place");
-	document.getElementById("training-content").value = sessionStorage.getItem("content");
-  
-  // 時と分のセレクトボックスに値を設定（例: 0〜23時）
+  document.getElementById("training-hour").value = sessionStorage.getItem("hour");
+  document.getElementById("training-minute").value = sessionStorage.getItem("minute");
+  document.getElementById("training-place").value = sessionStorage.getItem("place");
+  document.getElementById("training-content").value = sessionStorage.getItem("content");
+
+  // 時・分セレクトボックス
   const hourSelect = document.getElementById("training-hour");
   const minuteSelect = document.getElementById("training-minute");
 
@@ -18,22 +19,31 @@ document.addEventListener("DOMContentLoaded", function () {
     option.textContent = `${h}`;
     hourSelect.appendChild(option);
   }
+  for (let m = 0; m < 60; m += 5) {
+    const option = document.createElement("option");
+    option.value = String(m).padStart(2, '0');
+    option.textContent = `${m}`;
+    minuteSelect.appendChild(option);
+  }
 
-  // 保存ボタンのイベント
+  // 保存ボタンの処理
   window.saveTraining = function () {
-
     const dateTime = document.getElementById("training-datetime").value;
     const hour = document.getElementById("training-hour").value;
     const minute = document.getElementById("training-minute").value;
     const place = document.getElementById("training-place").value.trim();
     const content = document.getElementById("training-content").value.trim();
 
-    if (!formatted || !hour || !minute || !place || !content) {
+    if (!dateTime || !hour || !minute || !place || !content) {
       alert("全ての項目を入力してください。");
       return;
     }
 
     const token = sessionStorage.getItem("token");
+    if (!token) {
+      alert("ログイン情報が見つかりません。再度ログインしてください。");
+      return;
+    }
 
     const postData = {
       trainingTime: dateTime,
@@ -41,7 +51,6 @@ document.addEventListener("DOMContentLoaded", function () {
       trainingPlace: place,
       trainingComments: content
     };
-	
 
     fetch("http://localhost:8080/api/register-training", {
       method: "POST",
@@ -51,9 +60,14 @@ document.addEventListener("DOMContentLoaded", function () {
       },
       body: JSON.stringify(postData)
     })
-      .then(res => res.json())
-      .then(data => {
-        if (data.result === 1) {
+      .then(async res => {
+        const contentType = res.headers.get("Content-Type");
+        let body = {};
+        if (contentType && contentType.includes("application/json")) {
+          body = await res.json();
+        }
+
+        if (res.ok) {
           alert("練習日誌を保存しました。");
           sessionStorage.removeItem("fromPage");
           if (fromPage === "training") {
@@ -62,7 +76,8 @@ document.addEventListener("DOMContentLoaded", function () {
             window.location.href = PATHS.HOME_PAGE;
           }
         } else {
-          alert("保存に失敗しました。");
+          const errorMsg = body.error || "保存に失敗しました。";
+          alert(errorMsg);
         }
       })
       .catch(err => {
@@ -70,32 +85,9 @@ document.addEventListener("DOMContentLoaded", function () {
         alert("送信中にエラーが発生しました。");
       });
   };
-  
-  //跳躍内容を記入するため、一時保存
-  window.createJump = function () {
-	
-    const hour = document.getElementById("training-hour").value;
-    const minute = document.getElementById("training-minute").value;
-    const place = document.getElementById("training-place").value.trim();
-    const content = document.getElementById("training-content").value.trim();
-    
-    if (!hour || !minute || !place || !content) {
-      alert("全ての項目を入力してください。");
-      return;
-    }
-      
-    sessionStorage.setItem("formatted", formatted);
-    sessionStorage.setItem("hour", hour);
-    sessionStorage.setItem("minute", minute);
-    sessionStorage.setItem("place", place);
-    sessionStorage.setItem("content", content);
-
-	  // ===== 遷移先に "from=training" をクエリとして付与 =====
-		  window.location.href = PATHS.JUMP_PAGE + "?from=training";
-	};
 
   // キャンセルボタンの処理
   window.cancel = function () {
-      window.location.href = PATHS.HOME_PAGE;
+    window.location.href = PATHS.HOME_PAGE;
   };
 });
