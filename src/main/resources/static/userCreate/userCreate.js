@@ -22,7 +22,7 @@ document.getElementById("registerForm").addEventListener("submit", function(even
 	        alert("登録が完了しました。ログイン画面に戻ります。");
 	        window.location.href = PATHS.LOGIN_PAGE;
 	    } else {
-	        alert("登録に失敗しました。");
+	        alert("そのユーザー名またはパスワードはすでに登録されています。");
 	    }
 	})
     .catch(error => console.error('Error:', error));
