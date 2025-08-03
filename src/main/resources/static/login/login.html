@@ -1,32 +1,32 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ログイン画面</title>
-    <link rel="stylesheet" href="login.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ログイン画面</title>
+  <link rel="stylesheet" href="login.css" />
 </head>
 <body>
-    <div class="login-container">
-        <h1>ユーザー情報を入力してください</h1>
-        <form id="loginForm">
-            <p>ユーザー名</p>
-            <input type="text" id="userName" class="textbox" name="username" placeholder="ユーザー名を入力" required />
-            
-            <p>パスワード</p>
-            <input type="password" id="userPassword" class="textbox" name="userpassword" placeholder="パスワードを入力" required />
-            <label><input type="checkbox" id="showpassword" onchange="showOrHide()" /> パスワード表示</label>
-            
-            <button type="submit" id="submit">ログイン</button>
-        </form>
+  <div class="login-container">
+    <h1>ユーザー情報を入力してください</h1>
+    <form id="loginForm">
+      <p>ユーザー名</p>
+      <input type="text" id="userName" class="textbox" name="username" placeholder="ユーザー名を入力" required />
+      
+      <p>パスワード</p>
+      <input type="password" id="userPassword" class="textbox" name="userpassword" placeholder="パスワードを入力" required />
+      <label><input type="checkbox" id="showpassword" onchange="showOrHide()" /> パスワード表示</label>
+      
+      <button type="submit" id="submit">ログイン</button>
+    </form>
 
-        <div class="extra-buttons">
-            <button id="goUserCreateBtn" type="button">新規登録</button>
-            <button id="goPasswordResetBtn" type="button">パスワード再設定</button>
-        </div>
+    <div class="extra-buttons">
+      <button id="goUserCreateBtn" type="button">新規登録</button>
+      <button id="goPasswordResetBtn" type="button">パスワード再設定</button>
     </div>
+  </div>
 
-    <script src="login.js"></script>
-    <script src="/config.js"></script>
+  <script src="login.js"></script>
+  <script src="/config.js"></script>
 </body>
 </html>
