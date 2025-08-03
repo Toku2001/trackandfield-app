@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>日誌編集</title>
+  <link rel="stylesheet" href="daily.css" />
+</head>
+<body>
+  <h1>大会情報の編集</h1>
+  <form id="editForm">
+    <table border="1">
+      <tr>
+        <th>大会名</th>
+        <td><input type="text" id="tournament-name" name="tournamentName" /></td>
+      </tr>
+      <tr>
+        <th>日付</th>
+        <td><input type="date" id="tournament-time" name="tournamentTime" /></td>
+      </tr>
+      <tr>
+        <th>場所</th>
+        <td><input type="text" id="tournament-place" name="tournamentPlace" /></td>
+      </tr>
+      <tr>
+        <th>コメント</th>
+        <td><input type="text" id="tournament-comments" name="tournamentComments" /></td>
+      </tr>
+    </table>
+
+    <h1>跳躍記録の編集</h1>
+    <button type="button" id="deleteAllJumps">この日の跳躍記録をすべて削除</button>
+    <div id="jump-records-container"></div>
+
+    <h1>練習日誌の編集</h1>
+    <table border="1">
+      <tr>
+        <th>練習時間</th>
+        <td><input type="date" id="training-time" name="trainingTime" /></td>
+      </tr>
+      <tr>
+        <th>練習場所</th>
+        <td><input type="text" id="training-place" name="trainingPlace" /></td>
+      </tr>
+      <tr>
+        <th>練習内容</th>
+        <td><textarea id="training-comments" name="trainingComments" rows="4" cols="40"></textarea></td>
+      </tr>
+    </table>
+
+    <button type="submit" id="saveButton">保存</button>
+    <button type="button" onclick="goToDaily()">キャンセル</button>
+  </form>
+
+  <script src="/config.js"></script>
+  <script src="dailyEdit.js"></script>
+</body>
+</html>
