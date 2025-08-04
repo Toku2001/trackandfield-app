@@ -1,7 +1,7 @@
 package io.github.Toku2001.trackandfieldapp.service.competition;
 
-import io.github.Toku2001.trackandfieldapp.dto.competition.DeleteCompetitionRequest;
+import java.time.LocalDate;
 
 public interface DeleteCompetitionService{
-	int deleteCompetition(DeleteCompetitionRequest request);
+	int deleteCompetition(LocalDate competitionDate);
 }
