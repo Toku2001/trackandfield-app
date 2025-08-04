@@ -6,29 +6,29 @@
 	VALUES (#{userId}, #{trainingTime}, #{trainingPlace}, #{trainingComments})
 	</insert>
 
-<!--<select id="getTrainingByDate" resultType="io.github.Toku2001.trackandfieldapp.entity.Training_Info">-->
-<!--	SELECT training_time, training_place, training_comments FROM training_info -->
-<!--	WHERE training_time = #{trainingTime}-->
-<!--	AND user_id = #{userId}-->
-<!--	</select>-->
+<select id="getTrainingByDate" resultType="io.github.Toku2001.trackandfieldapp.entity.Training_Info">
+	SELECT training_id, training_time, training_place, training_comments FROM training_info 
+	WHERE training_time = #{trainingTime}
+	AND user_id = #{userId}
+	</select>
 
 <!--<select id="getTrainingByUserId" resultType="io.github.Toku2001.trackandfieldapp.entity.Training_Info">-->
 <!--	SELECT training_time, training_place, training_comments FROM training_info -->
 <!--	WHERE user_id = #{userId}-->
 <!--	</select>-->
 	
-<!--<update id="changeTraining" parameterType="io.github.Toku2001.trackandfieldapp.entity.Training_Info">-->
-<!--	UPDATE training_info -->
-<!--	SET training_place = #{trainingPlace}, training_comments = #{trainingComments}-->
-<!--	WHERE user_id = #{userId}-->
-<!--	AND training_time = #{trainingTime}-->
-<!--	</update>-->
+<update id="changeTraining" parameterType="io.github.Toku2001.trackandfieldapp.entity.Training_Info">
+	UPDATE training_info 
+	SET training_place = #{trainingPlace}, training_comments = #{trainingComments}, training_time = #{trainingTime}
+	WHERE user_id = #{userId}
+	AND training_id = #{trainingId}
+	</update>
 	
-<!--<delete id="deleteTraining" parameterType="io.github.Toku2001.trackandfieldapp.entity.Training_Info">-->
-<!--	DELETE FROM training_info -->
-<!--	WHERE user_id = #{userId}-->
-<!--	AND training_time = #{trainingTime}-->
-<!--	</delete>-->
+<delete id="deleteTraining" parameterType="io.github.Toku2001.trackandfieldapp.entity.Training_Info">-->
+	DELETE FROM training_info
+	WHERE user_id = #{userId}
+	AND training_time = #{trainingTime}
+	</delete>
 	
 <!--<select id="getTrainings" resultType="io.github.Toku2001.trackandfieldapp.entity.Training_Info">-->
 <!--	SELECT * FROM user_info -->

@@ -33,6 +33,7 @@ public class TrainingServiceImpl implements TrainingService{
             throw new DatabaseOperationException("想定のデータが取得できていません。", new Exception());
         }
         TrainingResponse trainingResonse = new TrainingResponse();
+        trainingResonse.setTrainingId(training_Info.getTraining_Id());
         trainingResonse.setTrainingTime(training_Info.getTraining_Time());
         trainingResonse.setTrainingPlace(training_Info.getTraining_Place());
         trainingResonse.setTrainingComments(training_Info.getTraining_Comments());
