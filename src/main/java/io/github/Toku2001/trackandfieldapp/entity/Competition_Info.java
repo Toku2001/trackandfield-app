@@ -10,8 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Competition_Info {
-    private long competition_Id;
-    private long user_Id;
+    private Integer competition_Id;
     private String competition_Name;
     private String competition_Place;
     private LocalDate competition_Time;

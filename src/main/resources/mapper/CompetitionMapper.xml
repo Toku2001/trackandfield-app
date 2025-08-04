@@ -24,7 +24,7 @@
 
   <!-- 日付で大会情報を取得 -->
   <select id="getCompetitionByDate" resultType="io.github.Toku2001.trackandfieldapp.entity.Competition_Info">
-    SELECT competition_name, competition_place, competition_time, competition_comments
+    SELECT competition_id, competition_name, competition_place, competition_time, competition_comments
     FROM competitions
     WHERE user_id = #{userId}
       AND competition_time = #{competitionTime}
@@ -43,6 +43,7 @@
     SELECT *
 	FROM competitions
 	WHERE competition_time::date >= CURRENT_DATE
+	AND user_id = #{userId}
 	ORDER BY competition_time ASC
 	LIMIT 1;
   </select>
@@ -53,9 +54,10 @@
     SET
       competition_name = #{competitionName},
       competition_place = #{competitionPlace},
-      competition_comments = #{competitionComments}
+      competition_comments = #{competitionComments},
+      competition_time = #{competitionTime}
     WHERE user_id = #{userId}
-      AND competition_time = #{competitionTime}
+      AND competition_id = #{competitionId}
   </update>
 
   <!-- 大会情報の削除 -->
