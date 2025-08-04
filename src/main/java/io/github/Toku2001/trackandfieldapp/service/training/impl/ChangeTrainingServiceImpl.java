@@ -25,6 +25,7 @@ public class ChangeTrainingServiceImpl implements ChangeTrainingService{
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	    UserDetailsForToken userDetails = (UserDetailsForToken) authentication.getPrincipal();
 	    int updateTrainingNumber = trainingMapper.changeTraining(userDetails.getUserId(),
+	    		 request.getTrainingId(),
 				 request.getTrainingTime(),
 				 request.getTrainingPlace(),
 				 request.getTrainingComments());

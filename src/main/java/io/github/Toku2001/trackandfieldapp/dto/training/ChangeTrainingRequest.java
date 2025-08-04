@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor 
 public class ChangeTrainingRequest {
+	private int trainingId;
 	@NotNull(message = "更新したい練習日誌の日付が正しくリクエストされていません")
     private LocalDate trainingTime;
     private String trainingPlace;
