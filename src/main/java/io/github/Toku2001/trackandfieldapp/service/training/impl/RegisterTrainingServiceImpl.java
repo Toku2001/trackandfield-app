@@ -1,5 +1,6 @@
 package io.github.Toku2001.trackandfieldapp.service.training.impl;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -22,13 +23,17 @@ public class RegisterTrainingServiceImpl implements RegisterTrainingService{
     public int registerTraining(RegisterTrainingRequest request) {
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	    UserDetailsForToken userDetails = (UserDetailsForToken) authentication.getPrincipal();
-        int registerNumber = trainingMapper.registerTraining(userDetails.getUserId(),
-        													 request.getTrainingTime(),
-        													 request.getTrainingPlace(),
-        													 request.getTrainingComments());
-        if (registerNumber == 0) {
-            throw new DatabaseOperationException("練習日誌を登録できませんでした", new Exception());
-        }
-        return registerNumber;
+	    try {
+	    	int registerNumber = trainingMapper.registerTraining(userDetails.getUserId(),
+					 request.getTrainingTime(),
+					 request.getTrainingPlace(),
+					 request.getTrainingComments());
+			if (registerNumber == 0) {
+			throw new DatabaseOperationException("練習日誌を登録できませんでした", new Exception());
+			}
+			return registerNumber;
+	    }catch (DataIntegrityViolationException e) {
+	         throw new IllegalStateException("この日付の練習日誌は既に登録されています。");
+	    }
     }
 }
