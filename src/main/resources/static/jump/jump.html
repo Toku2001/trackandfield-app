@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>跳躍記録登録</title>
+  <link rel="stylesheet" href="jump.css" />
+</head>
+<body>
+  <header>
+    <h1>跳躍記録 登録フォーム</h1>
+  </header>
+
+  <main>
+	<div class="common-fields">
+	  <label for="jumpDate">日付</label>
+	  <input type="date" id="jumpDate" required>
+
+	  <label for="recordType">記録種別</label>
+	  <select id="recordType" required>
+	    <option value="training">練習</option>
+	    <option value="official">競技会</option>
+	  </select>
+	</div>
+	
+    <div id="record-container">
+      <!-- 最初の記録ブロック -->
+    </div>
+
+    <div class="button-group">
+      <button id="addRecordBtn">記録を追加</button>
+      <button onclick="submitAllJumpRecords()">登録</button>
+	  <button onclick="cancel()">キャンセル</button>
+    </div>
+  </main>
+
+  <script src="/config.js"></script>
+  <script src="jump.js"></script>
+</body>
+</html>
