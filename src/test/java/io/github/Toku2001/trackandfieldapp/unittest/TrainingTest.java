@@ -23,7 +23,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import io.github.Toku2001.trackandfieldapp.dto.training.DeleteTrainingRequest;
 import io.github.Toku2001.trackandfieldapp.dto.training.TrainingResponse;
 import io.github.Toku2001.trackandfieldapp.dto.user.UserDetailsForToken;
 import io.github.Toku2001.trackandfieldapp.exception.DatabaseOperationException;
@@ -193,10 +192,8 @@ public class TrainingTest {
     
     @Test
     void delete_Success() throws Exception {
-        LocalDate date = LocalDate.of(2025, 7, 27);
-        DeleteTrainingRequest deleteTrainingRequest = new DeleteTrainingRequest(date);
 
-        when(deleteTrainingService.deleteTraining(deleteTrainingRequest))
+        when(deleteTrainingService.deleteTraining(LocalDate.of(2025, 7, 27)))
             .thenReturn(1); // 削除成功
 
         // JSON文字列を正しく構築
@@ -236,7 +233,7 @@ public class TrainingTest {
         String updateTrainingComments = "練習日誌を変更";
 //        ChangeTrainingRequest changeTrainingRequest = new ChangeTrainingRequest(date, updateTrainingPlace, updateTrainingComments);
 
-        when(trainingMapper.changeTraining(anyLong(), eq(date), eq(updateTrainingPlace), eq(updateTrainingComments)))
+        when(trainingMapper.changeTraining(anyLong(), anyInt(), eq(date), eq(updateTrainingPlace), eq(updateTrainingComments)))
             .thenReturn(1); // 削除成功
 
         // JSON文字列を正しく構築

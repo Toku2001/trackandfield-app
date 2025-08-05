@@ -266,12 +266,13 @@ public class CompetitionControllerTest {
     //GET
     @Test
     void getCompetitionByDate_valid_shouldReturn200() throws Exception {
-        CompetitionResponse response = new CompetitionResponse("大会", "競技場", LocalDate.of(2025, 7, 28), "コメント");
+        CompetitionResponse response = new CompetitionResponse(1, "大会", "競技場", LocalDate.of(2025, 7, 28), "コメント");
         when(competitionService.getCompetitionByDate(any())).thenReturn(response);
 
         mockMvc.perform(get("/api/get-competition")
                 .param("competitionDate", "2025-07-28"))
             .andExpect(status().isOk())
+            .andExpect(jsonPath("$.competitionId").value(1))
             .andExpect(jsonPath("$.competitionName").value("大会"))
             .andExpect(jsonPath("$.competitionPlace").value("競技場"))
             .andExpect(jsonPath("$.competitionTime").value("2025-07-28"))
@@ -291,12 +292,13 @@ public class CompetitionControllerTest {
     //次の大会情報を取得
     @Test
     void getNextCompetition_valid_shouldReturn200() throws Exception {
-        CompetitionResponse response = new CompetitionResponse("大会", "競技場", LocalDate.of(2025, 7, 28), "コメント");
+        CompetitionResponse response = new CompetitionResponse(1, "大会", "競技場", LocalDate.of(2025, 7, 28), "コメント");
         when(competitionService.getNextCompetition()).thenReturn(response);
 
         mockMvc.perform(get("/api/get-competition-upcoming"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.competitionName").value("大会"))
+            .andExpect(jsonPath("$.competitionId").value(1))
             .andExpect(jsonPath("$.competitionPlace").value("競技場"))
             .andExpect(jsonPath("$.competitionTime").value("2025-07-28"))
             .andExpect(jsonPath("$.competitionComments").value("コメント"));
