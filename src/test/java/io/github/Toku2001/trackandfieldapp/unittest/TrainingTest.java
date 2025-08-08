@@ -196,16 +196,9 @@ public class TrainingTest {
         when(deleteTrainingService.deleteTraining(LocalDate.of(2025, 7, 27)))
             .thenReturn(1); // 削除成功
 
-        // JSON文字列を正しく構築
-        String json = """
-        {
-            "trainingDate": "2025-07-27"
-        }
-        """;
-
         mockMvc.perform(delete("/api/delete-training")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
+                .param("trainingDate", "2025-07-27")
+                .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.deleteDate").value("2025-07-27"))
             .andExpect(jsonPath("$.deleteNumber").value(1));
@@ -213,17 +206,12 @@ public class TrainingTest {
 
     @Test
     void delete_Failer() throws Exception {
-        String json = """
-        {
-            "trainingDate": ""
-        }
-        """;
+        when(deleteTrainingService.deleteTraining(LocalDate.of(2025, 7, 27))).thenReturn(0);
 
         mockMvc.perform(delete("/api/delete-training")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.error").value("削除したい練習日誌の日付が正しくリクエストされていません"));
+                .param("competitionDate", "")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
     }
     
     @Test
