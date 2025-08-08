@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import io.github.Toku2001.trackandfieldapp.dto.competition.ChangeCompetitionRequest;
 import io.github.Toku2001.trackandfieldapp.dto.competition.CompetitionResponse;
-import io.github.Toku2001.trackandfieldapp.dto.competition.DeleteCompetitionRequest;
 import io.github.Toku2001.trackandfieldapp.dto.competition.RegisterCompetitionRequest;
 import io.github.Toku2001.trackandfieldapp.dto.user.UserDetailsForToken;
 import io.github.Toku2001.trackandfieldapp.entity.Competition_Info;
@@ -66,6 +65,7 @@ class CompetitionServiceImplTest {
     
     private ChangeCompetitionRequest changeValidRequest() {
         return new ChangeCompetitionRequest(
+        		1,
             "大会名",
             "競技場",
             LocalDate.of(2025, 7, 27),
@@ -156,13 +156,12 @@ class CompetitionServiceImplTest {
     void deleteCompetition_validRequest_shouldReturnRegisterNumber() {
         setAuthentication(new UserDetailsForToken(1L, "testuser", List.of()));
 
-        DeleteCompetitionRequest deleteRequest = new DeleteCompetitionRequest(LocalDate.of(2025, 7, 27));
         when(mapper.deleteCompetition(
             anyLong(),
             any(LocalDate.class)))
         .thenReturn(1);
 
-        int deleteResult = deleteService.deleteCompetition(deleteRequest);
+        int deleteResult = deleteService.deleteCompetition(LocalDate.of(2025, 7, 27));
         assertEquals(1, deleteResult);
     }
     
@@ -170,13 +169,12 @@ class CompetitionServiceImplTest {
     void deleteCompetition_mapperReturnsZero_shouldThrowDatabaseOperationException() {
         setAuthentication(new UserDetailsForToken(1L, "testuser", List.of()));
 
-        DeleteCompetitionRequest deleteRequest = new DeleteCompetitionRequest(LocalDate.of(2025, 7, 27));
         when(mapper.deleteCompetition(
             anyLong(),
             any(LocalDate.class)))
         .thenReturn(0);
 
-        Exception ex = assertThrows(DatabaseOperationException.class, () -> deleteService.deleteCompetition(deleteRequest));
+        Exception ex = assertThrows(DatabaseOperationException.class, () -> deleteService.deleteCompetition(LocalDate.of(2025, 7, 27)));
         assertEquals("正しく競技会情報が削除されませんでした", ex.getMessage());
     }
     
@@ -188,6 +186,7 @@ class CompetitionServiceImplTest {
         ChangeCompetitionRequest changeRequest = changeValidRequest();
         when(mapper.changeCompetition(
                 anyLong(),
+                anyInt(),
                 anyString(),
                 anyString(),
                 any(LocalDate.class),
@@ -205,6 +204,7 @@ class CompetitionServiceImplTest {
         ChangeCompetitionRequest changeRequest = changeValidRequest();
         when(mapper.changeCompetition(
                 anyLong(),
+                anyInt(),
                 anyString(),
                 anyString(),
                 any(LocalDate.class),
@@ -222,8 +222,7 @@ class CompetitionServiceImplTest {
         
         // モックが返すレスポンスを定義
         Competition_Info mockResponse = new Competition_Info();
-        mockResponse.setCompetition_Id(1L);
-        mockResponse.setUser_Id(1L);
+        mockResponse.setCompetition_Id(0);
         mockResponse.setCompetition_Name("大会名");
         mockResponse.setCompetition_Place("場所");
         mockResponse.setCompetition_Time(LocalDate.of(2025, 7, 27));
@@ -250,8 +249,7 @@ class CompetitionServiceImplTest {
         
         // モックが返すレスポンスを定義
         Competition_Info mockResponse = new Competition_Info();
-        mockResponse.setCompetition_Id(1L);
-        mockResponse.setUser_Id(1L);
+        mockResponse.setCompetition_Id(1);
         mockResponse.setCompetition_Name("大会名");
         mockResponse.setCompetition_Place("場所");
         mockResponse.setCompetition_Time(LocalDate.of(2025, 7, 27));
@@ -279,8 +277,7 @@ class CompetitionServiceImplTest {
         
         // モックが返すレスポンスを定義
         Competition_Info mockNextResponse = new Competition_Info();
-        mockNextResponse.setCompetition_Id(1L);
-        mockNextResponse.setUser_Id(1L);
+        mockNextResponse.setCompetition_Id(1);
         mockNextResponse.setCompetition_Name("大会名");
         mockNextResponse.setCompetition_Place("場所");
         mockNextResponse.setCompetition_Time(LocalDate.of(2025, 7, 27));
@@ -291,8 +288,8 @@ class CompetitionServiceImplTest {
         competitionNextResponse.setCompetitionPlace("場所");
         competitionNextResponse.setCompetitionTime(LocalDate.of(2025, 7, 27));
 
-        when(mapper.getNextCompetition())
-            .thenReturn(mockNextResponse);
+       when(mapper.getNextCompetition(1L))
+           .thenReturn(mockNextResponse);
 
         CompetitionResponse getResult = competitionService.getNextCompetition();
         assertEquals(competitionNextResponse, getResult);
@@ -304,8 +301,7 @@ class CompetitionServiceImplTest {
         
         // モックが返すレスポンスを定義
         Competition_Info mockResponse = new Competition_Info();
-        mockResponse.setCompetition_Id(1L);
-        mockResponse.setUser_Id(1L);
+        mockResponse.setCompetition_Id(1);
         mockResponse.setCompetition_Name("大会名");
         mockResponse.setCompetition_Place("場所");
         mockResponse.setCompetition_Time(LocalDate.of(2025, 7, 27));
@@ -317,8 +313,8 @@ class CompetitionServiceImplTest {
         competitionResponse.setCompetitionTime(LocalDate.of(2025, 7, 27));
         competitionResponse.setCompetitionComments("コメント");
 
-        when(mapper.getNextCompetition())
-        .thenReturn(null);
+       when(mapper.getNextCompetition(1L))
+       .thenReturn(null);
 
         Exception ex = assertThrows(DatabaseOperationException.class, () -> competitionService.getNextCompetition());
         assertEquals("想定のデータが取得できていません。", ex.getMessage());
