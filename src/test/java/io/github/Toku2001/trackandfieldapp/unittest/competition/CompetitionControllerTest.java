@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import io.github.Toku2001.trackandfieldapp.dto.competition.CompetitionResponse;
 import io.github.Toku2001.trackandfieldapp.dto.competition.RegisterCompetitionRequest;
 import io.github.Toku2001.trackandfieldapp.dto.user.UserDetailsForToken;
+import io.github.Toku2001.trackandfieldapp.exception.DatabaseOperationException;
 import io.github.Toku2001.trackandfieldapp.repository.CompetitionMapper;
 import io.github.Toku2001.trackandfieldapp.service.competition.ChangeCompetitionService;
 import io.github.Toku2001.trackandfieldapp.service.competition.CompetitionService;
@@ -231,23 +232,17 @@ public class CompetitionControllerTest {
     //DELETE
     @Test
     void deleteCompetition_validInput_shouldReturn200() throws Exception {
-        when(deleteCompetitionService.deleteCompetition(any())).thenReturn(1);
-
-        String json = """
-            {
-                "competitionDate": "2025-07-28"
-            }
-            """;
+        when(deleteCompetitionService.deleteCompetition(LocalDate.of(2025, 7, 27))).thenReturn(1);
 
         mockMvc.perform(delete("/api/delete-competition")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
+                .param("competitionDate", "2025-07-27")
+                .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(content().string("1"));
     }
     
     @Test
-    void deleteCompetition_invalid_shouldReturn401() throws Exception {
+    void deleteCompetition_invalid_shouldReturn400() throws Exception {
         when(deleteCompetitionService.deleteCompetition(any())).thenReturn(0); // 失敗
 
         String json = """
@@ -259,8 +254,8 @@ public class CompetitionControllerTest {
         mockMvc.perform(delete("/api/delete-competition")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
-            .andExpect(status().isUnauthorized())
-            .andExpect(status().reason("Invalid credentials"));
+            .andExpect(status().isBadRequest())
+            .andExpect(status().reason("Required parameter 'competitionDate' is not present."));
     }
     
     //GET
