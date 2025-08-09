@@ -2,11 +2,13 @@ package io.github.Toku2001.trackandfieldapp.unittest.training;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -16,12 +18,16 @@ import org.mockito.*;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cglib.core.Local;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 
+import io.github.Toku2001.trackandfieldapp.dto.competition.ChangeCompetitionRequest;
+import io.github.Toku2001.trackandfieldapp.dto.training.ChangeTrainingRequest;
 import io.github.Toku2001.trackandfieldapp.dto.training.RegisterTrainingRequest;
+import io.github.Toku2001.trackandfieldapp.dto.training.TrainingRequest;
 import io.github.Toku2001.trackandfieldapp.dto.training.TrainingResponse;
 import io.github.Toku2001.trackandfieldapp.dto.user.UserDetailsForToken;
 import io.github.Toku2001.trackandfieldapp.entity.Training_Info;
@@ -54,6 +60,15 @@ public class TrainingServiceTraining {
 
     @Mock
     private TrainingMapper trainingMapper;
+
+    private ChangeTrainingRequest changeTrainingRequest(){
+        ChangeTrainingRequest changeTrainingRequest = new ChangeTrainingRequest();
+        changeTrainingRequest.setTrainingId(1);
+        changeTrainingRequest.setTrainingComments("跳躍練習");
+        changeTrainingRequest.setTrainingPlace("学校");
+        changeTrainingRequest.setTrainingTime(LocalDate.of(2025, 07, 27));
+        return changeTrainingRequest;
+    }
 
     @BeforeEach
     void setUp() {
@@ -181,5 +196,37 @@ public class TrainingServiceTraining {
             eq(request.getTrainingPlace()),
             eq(request.getTrainingComments())
         );
+    }
+
+    @Test
+    void updateTraining_shouldReturnChangeNumber() {
+
+        when(trainingMapper.changeTraining(
+                anyLong(),
+                anyInt(),
+                any(LocalDate.class),
+                anyString(),
+                anyString()))
+            .thenReturn(1);
+
+        ChangeTrainingRequest changeRequest = changeTrainingRequest();
+        int changeResult = changeTrainingServiceImpl.changeTraining(changeRequest);
+        assertEquals(1, changeResult);
+    }
+
+    @Test
+    void updateTraining_ZeroChangeNumber() {
+
+        when(trainingMapper.changeTraining(
+                anyLong(),
+                anyInt(),
+                any(LocalDate.class),
+                anyString(),
+                anyString()))
+            .thenReturn(0);
+
+        ChangeTrainingRequest changeRequest = changeTrainingRequest();
+        Exception ex = assertThrows(DatabaseOperationException.class, () -> changeTrainingServiceImpl.changeTraining(changeRequest));
+        assertEquals("練習日誌の更新件数が0件です。", ex.getMessage());
     }
 }
