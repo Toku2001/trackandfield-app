@@ -65,7 +65,9 @@ class JumpServiceLayerTest {
     @Test
     void changeJump_Success() {
         ChangeJumpRequest req = new ChangeJumpRequest();
-        doNothing().when(jumpMapper).changeJump(eq(1L), any(ChangeJumpRequest.class));
+
+        // 戻り値ありメソッドなので、doNothing()ではなくwhen().thenReturn()を使う
+        when(jumpMapper.changeJump(eq(1L), any(ChangeJumpRequest.class))).thenReturn(1);
 
         int result = changeJumpService.changeJump(List.of(req));
 
