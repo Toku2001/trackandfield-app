@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import io.github.Toku2001.trackandfieldapp.dto.training.ChangeTrainingRequest;
 import io.github.Toku2001.trackandfieldapp.dto.training.RegisterTrainingRequest;
 import io.github.Toku2001.trackandfieldapp.dto.training.TrainingResponse;
 import io.github.Toku2001.trackandfieldapp.dto.user.UserDetailsForToken;
@@ -92,9 +93,9 @@ public class TrainingTest {
             }
             """;
 
-        when(trainingMapper.registerTraining(anyLong(), any(LocalDate.class), anyString(), anyString()))
-                .thenReturn(1); // DB登録成功を模擬
-
+        when(registerTrainingService.registerTraining(any(RegisterTrainingRequest.class)))
+            .thenReturn(1);
+        
         mockMvc.perform(post("/api/register-training")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
@@ -252,13 +253,8 @@ public class TrainingTest {
     
     @Test
     void update_Success() throws Exception {
-        LocalDate date = LocalDate.of(2025, 7, 27);
-        String updateTrainingPlace = "練習場所を変更";
-        String updateTrainingComments = "練習日誌を変更";
-//        ChangeTrainingRequest changeTrainingRequest = new ChangeTrainingRequest(date, updateTrainingPlace, updateTrainingComments);
-
-        when(trainingMapper.changeTraining(anyLong(), anyInt(), eq(date), eq(updateTrainingPlace), eq(updateTrainingComments)))
-            .thenReturn(1); // 削除成功
+        when(changeTrainingService.changeTraining(any(ChangeTrainingRequest.class)))
+    .thenReturn(1);
 
         // JSON文字列を正しく構築
         String json = """
