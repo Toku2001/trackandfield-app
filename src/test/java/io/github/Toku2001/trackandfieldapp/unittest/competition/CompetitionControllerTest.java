@@ -184,7 +184,7 @@ public class CompetitionControllerTest {
         
         RegisterCompetitionRequest registerCompetitionRequest = new RegisterCompetitionRequest(competitionName, competitionPlace, competitionTime, competitionComments);
 
-        when(competitionMapper.registerCompetition(anyLong(), any(), any(), any(LocalDate.class), any()))
+        when(registerCompetitionService.registerCompetition(registerCompetitionRequest))
                 .thenReturn(1);
 
         int result = registerCompetitionService.registerCompetition(registerCompetitionRequest);
