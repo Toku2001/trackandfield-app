@@ -240,22 +240,17 @@ public class CompetitionControllerTest {
             .andExpect(status().isOk())
             .andExpect(content().string("1"));
     }
-    
-    @Test
-    void deleteCompetition_invalid_shouldReturn400() throws Exception {
-        when(deleteCompetitionService.deleteCompetition(any())).thenReturn(0); // 失敗
 
-        String json = """
-            {
-                "competitionDate": "2025-07-28"
-            }
-            """;
+    @Test
+    void deleteCompetition_shouldReturn401_whenServiceReturns0() throws Exception {
+        // サービスが0を返すようにモック
+        when(deleteCompetitionService.deleteCompetition(any(LocalDate.class)))
+            .thenReturn(0);
 
         mockMvc.perform(delete("/api/delete-competition")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-            .andExpect(status().isBadRequest())
-            .andExpect(status().reason("Required parameter 'competitionDate' is not present."));
+                .param("competitionDate", "2025-07-28"))
+            .andExpect(status().isUnauthorized()) // 401
+            .andExpect(status().reason("Invalid credentials"));
     }
     
     //GET

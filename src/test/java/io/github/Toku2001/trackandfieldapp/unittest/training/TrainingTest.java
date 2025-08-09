@@ -242,13 +242,15 @@ public class TrainingTest {
     }
 
     @Test
-    void delete_Failer() throws Exception {
-        when(deleteTrainingService.deleteTraining(LocalDate.of(2025, 7, 27))).thenReturn(0);
+    void deleteTraining_shouldReturn401_whenServiceReturns0() throws Exception {
+        // サービスが0を返すようにモック
+        when(deleteTrainingService.deleteTraining(any(LocalDate.class)))
+            .thenReturn(0);
 
         mockMvc.perform(delete("/api/delete-training")
-                .param("competitionDate", "")
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isBadRequest());
+                .param("trainingDate", "2025-07-28"))
+            .andExpect(status().isUnauthorized()) // 401
+            .andExpect(status().reason("Invalid credentials"));
     }
     
     @Test
