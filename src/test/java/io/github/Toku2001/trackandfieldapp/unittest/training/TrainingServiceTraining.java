@@ -1,6 +1,10 @@
 package io.github.Toku2001.trackandfieldapp.unittest.training;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
@@ -17,6 +21,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 
+import io.github.Toku2001.trackandfieldapp.dto.training.RegisterTrainingRequest;
 import io.github.Toku2001.trackandfieldapp.dto.training.TrainingResponse;
 import io.github.Toku2001.trackandfieldapp.dto.user.UserDetailsForToken;
 import io.github.Toku2001.trackandfieldapp.entity.Training_Info;
@@ -123,5 +128,58 @@ public class TrainingServiceTraining {
         });
 
         assertTrue(thrown.getMessage().contains("想定のデータが取得できていません。"));
+    }
+
+    @Test
+    void registerTraining_Success() {
+        RegisterTrainingRequest request = new RegisterTrainingRequest();
+        request.setTrainingTime(LocalDate.of(2025, 7, 27));
+        request.setTrainingPlace("競技場");
+        request.setTrainingComments("コメント");
+
+        when(trainingMapper.registerTraining(
+            eq(1L),
+            eq(request.getTrainingTime()),
+            eq(request.getTrainingPlace()),
+            eq(request.getTrainingComments())))
+            .thenReturn(1);
+
+        int result = registerTrainingServiceImpl.registerTraining(request);
+
+        assertEquals(1, result);
+        verify(trainingMapper).registerTraining(
+            eq(1L),
+            eq(request.getTrainingTime()),
+            eq(request.getTrainingPlace()),
+            eq(request.getTrainingComments())
+        );
+    }
+
+    @Test
+    void registerTraining_DataIntegrityViolationException() {
+        RegisterTrainingRequest request = new RegisterTrainingRequest();
+        request.setTrainingTime(LocalDate.of(2025, 7, 27));
+        request.setTrainingPlace("競技場");
+        request.setTrainingComments("コメント");
+
+        // DataIntegrityViolationExceptionをスローする設定
+        when(trainingMapper.registerTraining(
+            anyLong(),
+            any(LocalDate.class),
+            anyString(),
+            anyString()))
+            .thenThrow(new org.springframework.dao.DataIntegrityViolationException("duplicate key"));
+
+        IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> {
+            registerTrainingServiceImpl.registerTraining(request);
+        });
+
+        assertEquals("この日付の練習日誌は既に登録されています。", thrown.getMessage());
+        verify(trainingMapper).registerTraining(
+            eq(1L),
+            eq(request.getTrainingTime()),
+            eq(request.getTrainingPlace()),
+            eq(request.getTrainingComments())
+        );
     }
 }

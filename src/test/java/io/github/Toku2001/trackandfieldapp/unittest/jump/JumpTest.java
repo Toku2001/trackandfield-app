@@ -19,6 +19,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import io.github.Toku2001.trackandfieldapp.dto.competition.CompetitionResponse;
+import io.github.Toku2001.trackandfieldapp.dto.jump.JumpResponse;
 import io.github.Toku2001.trackandfieldapp.dto.jump.PersonalBestResponse;
 import io.github.Toku2001.trackandfieldapp.service.competition.CompetitionService;
 import io.github.Toku2001.trackandfieldapp.service.jump.ChangeJumpService;
@@ -218,5 +219,24 @@ public class JumpTest {
 
 		mockMvc.perform(get("/api/get-personal-best"))
 			.andExpect(status().isInternalServerError());
+	}
+
+	@Test
+	void getJumpRecords() throws Exception{
+		JumpResponse jumpResponse = new JumpResponse(1L, "PV", 5.30, 12, "4.6", "150", "Official", "2025-07-27");
+		LocalDate jumpDate = LocalDate.of(2025, 7, 27);
+		when(jumpService.getJumpRecords(jumpDate)).thenReturn(List.of(jumpResponse));
+
+		mockMvc.perform(get("/api/get-jump-records")
+				.param("jumpDate", "2025-07-27"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$[0].jumpEventId").value(1L))
+			.andExpect(jsonPath("$[0].event").value("PV"))
+			.andExpect(jsonPath("$[0].distance").value(5.30))
+			.andExpect(jsonPath("$[0].approach").value(12))
+			.andExpect(jsonPath("$[0].poleFeat").value("4.6"))
+			.andExpect(jsonPath("$[0].polePond").value("150"))
+			.andExpect(jsonPath("$[0].recordType").value("Official"))
+			.andExpect(jsonPath("$[0].jumpDate").value("2025-07-27"));
 	}
 }

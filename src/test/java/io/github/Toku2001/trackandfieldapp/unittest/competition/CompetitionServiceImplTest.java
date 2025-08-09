@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -149,6 +150,28 @@ class CompetitionServiceImplTest {
         .thenThrow(new RuntimeException("DBエラー"));
 
         assertThrows(RuntimeException.class, () -> registerService.registerCompetition(request));
+    }
+
+    @Test
+    void registerCompetition_whenDataIntegrityViolationExceptionThrown_shouldThrowIllegalStateException() {
+        setAuthentication(new UserDetailsForToken(1L, "testuser", List.of()));
+
+        RegisterCompetitionRequest request = createValidRequest();
+
+        // モックで DataIntegrityViolationException をスローさせる
+        when(mapper.registerCompetition(
+            anyLong(),
+            anyString(),
+            anyString(),
+            any(LocalDate.class),
+            anyString()))
+        .thenThrow(new DataIntegrityViolationException("duplicate key"));
+
+        IllegalStateException ex = assertThrows(IllegalStateException.class, () -> {
+            registerService.registerCompetition(request);
+        });
+
+        assertEquals("この日付の大会は既に登録されています。", ex.getMessage());
     }
 
     //競技会情報削除

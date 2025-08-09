@@ -23,12 +23,18 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+import io.github.Toku2001.trackandfieldapp.dto.training.RegisterTrainingRequest;
 import io.github.Toku2001.trackandfieldapp.dto.training.TrainingResponse;
 import io.github.Toku2001.trackandfieldapp.dto.user.UserDetailsForToken;
 import io.github.Toku2001.trackandfieldapp.exception.DatabaseOperationException;
 import io.github.Toku2001.trackandfieldapp.repository.PasswordMapper;
 import io.github.Toku2001.trackandfieldapp.repository.TrainingMapper;
+import io.github.Toku2001.trackandfieldapp.service.training.ChangeTrainingService;
 import io.github.Toku2001.trackandfieldapp.service.training.DeleteTrainingService;
+import io.github.Toku2001.trackandfieldapp.service.training.RegisterTrainingService;
 import io.github.Toku2001.trackandfieldapp.service.training.TrainingService;
 
 @SpringBootTest
@@ -52,6 +58,15 @@ public class TrainingTest {
     
     @MockBean
     private DeleteTrainingService deleteTrainingService;
+
+    @MockBean
+    private RegisterTrainingService registerTrainingService;
+
+    @MockBean
+    private ChangeTrainingService changeTrainingService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
     
     @BeforeEach
     void setUp() {
@@ -174,6 +189,27 @@ public class TrainingTest {
             .andExpect(jsonPath("$.trainingPlace").value("競技場"))
             .andExpect(jsonPath("$.trainingComments").value("問題なし"))
             .andExpect(jsonPath("$.trainingTime").value(date.toString()));
+    }
+
+    @Test
+    void registerTraining_Conflict() throws Exception {
+        RegisterTrainingRequest request = new RegisterTrainingRequest();
+        request.setTrainingTime(LocalDate.of(2025, 7, 27));
+        request.setTrainingPlace("競技場");
+        request.setTrainingComments("コメント");
+
+        when(registerTrainingService.registerTraining(any(RegisterTrainingRequest.class)))
+            .thenThrow(new IllegalStateException("この日付の練習日誌は既に登録されています。"));
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        mockMvc.perform(post("/api/register-training")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(request)))
+            .andExpect(status().isConflict())
+            .andExpect(jsonPath("$.error").value("この日付の練習日誌は既に登録されています。"));
     }
     
     @Test
