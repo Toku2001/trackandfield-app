@@ -1,4 +1,4 @@
-package io.github.Toku2001.trackandfieldapp.unittest;
+package io.github.Toku2001.trackandfieldapp.unittest.jump;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
