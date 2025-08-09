@@ -26,6 +26,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
 import io.github.Toku2001.trackandfieldapp.dto.competition.CompetitionResponse;
 import io.github.Toku2001.trackandfieldapp.dto.competition.RegisterCompetitionRequest;
 import io.github.Toku2001.trackandfieldapp.dto.user.UserDetailsForToken;
@@ -184,8 +187,30 @@ public class CompetitionControllerTest {
         when(competitionMapper.registerCompetition(anyLong(), any(), any(), any(LocalDate.class), any()))
                 .thenReturn(1);
 
-        int result = registerCompetitionServiceImpl.registerCompetition(registerCompetitionRequest);
+        int result = registerCompetitionService.registerCompetition(registerCompetitionRequest);
         assertEquals(1, result);
+    }
+
+    @Test
+    void registerCompetition_Conflict() throws Exception {
+        RegisterCompetitionRequest request = new RegisterCompetitionRequest();
+        request.setCompetitionTime(LocalDate.of(2025, 7, 27));
+        request.setCompetitionPlace("競技場");
+        request.setCompetitionComments("コメント");
+        request.setCompetitionName("試合");
+
+        when(registerCompetitionService.registerCompetition(any(RegisterCompetitionRequest.class)))
+            .thenThrow(new IllegalStateException("この日付の競技会情報は既に登録されています。"));
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        mockMvc.perform(post("/api/register-competition")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(request)))
+            .andExpect(status().isConflict())
+            .andExpect(jsonPath("$.error").value("この日付の競技会情報は既に登録されています。"));
     }
     
     //PUT

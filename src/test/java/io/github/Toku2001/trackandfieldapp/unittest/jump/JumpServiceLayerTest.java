@@ -85,6 +85,24 @@ class JumpServiceLayerTest {
     }
 
     @Test
+	void changeJump_notAllUpdatesSuccessful_shouldReturn0() {
+		// 2件の更新リクエスト
+		ChangeJumpRequest req1 = new ChangeJumpRequest();
+		ChangeJumpRequest req2 = new ChangeJumpRequest();
+		List<ChangeJumpRequest> requests = List.of(req1, req2);
+
+		// jumpMapper.changeJump が1件目は1件更新成功、2件目は0件（失敗）を返す
+		when(jumpMapper.changeJump(anyLong(), any(ChangeJumpRequest.class)))
+			.thenReturn(1)
+			.thenReturn(0);
+
+		int result = changeJumpService.changeJump(requests);
+
+		// 更新件数がリクエスト件数に満たないため0が返る
+		assertEquals(0, result);
+	}
+
+    @Test
     void deleteById_Success() {
         when(jumpMapper.deleteById(10L)).thenReturn(1);
 

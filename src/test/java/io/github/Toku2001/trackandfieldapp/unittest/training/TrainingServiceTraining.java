@@ -199,6 +199,27 @@ public class TrainingServiceTraining {
     }
 
     @Test
+    void registerTraining_whenMapperReturnsZero_shouldThrowDatabaseOperationException() {
+        RegisterTrainingRequest request = new RegisterTrainingRequest();
+        request.setTrainingTime(LocalDate.of(2025, 7, 27));
+        request.setTrainingPlace("競技場");
+        request.setTrainingComments("コメント");
+
+        when(trainingMapper.registerTraining(
+            anyLong(),
+            any(LocalDate.class),
+            anyString(),
+            anyString()))
+            .thenReturn(0); // 0を返して登録失敗を模擬
+
+        DatabaseOperationException thrown = assertThrows(DatabaseOperationException.class, () -> {
+            registerTrainingServiceImpl.registerTraining(request);
+        });
+
+        assertEquals("練習日誌を登録できませんでした", thrown.getMessage());
+    }
+
+    @Test
     void updateTraining_shouldReturnChangeNumber() {
 
         when(trainingMapper.changeTraining(

@@ -1,5 +1,6 @@
 package io.github.Toku2001.trackandfieldapp.unittest.jump;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -15,12 +16,16 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import io.github.Toku2001.trackandfieldapp.dto.competition.CompetitionResponse;
+import io.github.Toku2001.trackandfieldapp.dto.jump.ChangeJumpRequest;
 import io.github.Toku2001.trackandfieldapp.dto.jump.JumpResponse;
 import io.github.Toku2001.trackandfieldapp.dto.jump.PersonalBestResponse;
+import io.github.Toku2001.trackandfieldapp.dto.user.UserDetailsForToken;
 import io.github.Toku2001.trackandfieldapp.service.competition.CompetitionService;
 import io.github.Toku2001.trackandfieldapp.service.jump.ChangeJumpService;
 import io.github.Toku2001.trackandfieldapp.service.jump.DeleteJumpService;
