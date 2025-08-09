@@ -19,7 +19,7 @@ public interface JumpMapper {
 	List<Jump_Events> getJumpRecord(@Param("userId") Long userId, @Param("date") LocalDate date);
 	
 	// 跳躍記録の更新
-	void changeJump(@Param("userId") long userId, @Param("event") ChangeJumpRequest event);
+	int changeJump(@Param("userId") long userId, @Param("event") ChangeJumpRequest event);
 	
 	//跳躍記録の一部削除
 	int deleteById(@Param("jumpEventId") Long jumpEventId);

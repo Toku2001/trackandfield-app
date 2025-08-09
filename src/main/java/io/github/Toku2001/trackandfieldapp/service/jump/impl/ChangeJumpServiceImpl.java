@@ -30,8 +30,8 @@ public class ChangeJumpServiceImpl implements ChangeJumpService{
 	    int changeJumpRecordNumber = 0;
 	    try {
 			for(ChangeJumpRequest target : changeJumpRequest) {
-				jumpMapper.changeJump(userId, target);
-				changeJumpRecordNumber++;
+				int updatedCount = jumpMapper.changeJump(userId, target);
+            	changeJumpRecordNumber += updatedCount;
 			}
 			if(changeJumpRecordNumber == changeJumpRequest.size()) {
 				return 1;
