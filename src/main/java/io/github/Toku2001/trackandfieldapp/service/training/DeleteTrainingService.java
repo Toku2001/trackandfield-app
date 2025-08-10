@@ -1,7 +1,7 @@
 package io.github.Toku2001.trackandfieldapp.service.training;
 
-import io.github.Toku2001.trackandfieldapp.dto.training.DeleteTrainingRequest;
+import java.time.LocalDate;
 
 public interface DeleteTrainingService{
-	int deleteTraining(DeleteTrainingRequest request);
+	int deleteTraining(LocalDate trainingDate);
 }

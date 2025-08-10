@@ -1,4 +1,4 @@
-package io.github.Toku2001.trackandfieldapp.unittest;
+package io.github.Toku2001.trackandfieldapp.unittest.training;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -23,13 +23,19 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import io.github.Toku2001.trackandfieldapp.dto.training.DeleteTrainingRequest;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+import io.github.Toku2001.trackandfieldapp.dto.training.ChangeTrainingRequest;
+import io.github.Toku2001.trackandfieldapp.dto.training.RegisterTrainingRequest;
 import io.github.Toku2001.trackandfieldapp.dto.training.TrainingResponse;
 import io.github.Toku2001.trackandfieldapp.dto.user.UserDetailsForToken;
 import io.github.Toku2001.trackandfieldapp.exception.DatabaseOperationException;
 import io.github.Toku2001.trackandfieldapp.repository.PasswordMapper;
 import io.github.Toku2001.trackandfieldapp.repository.TrainingMapper;
+import io.github.Toku2001.trackandfieldapp.service.training.ChangeTrainingService;
 import io.github.Toku2001.trackandfieldapp.service.training.DeleteTrainingService;
+import io.github.Toku2001.trackandfieldapp.service.training.RegisterTrainingService;
 import io.github.Toku2001.trackandfieldapp.service.training.TrainingService;
 
 @SpringBootTest
@@ -53,6 +59,15 @@ public class TrainingTest {
     
     @MockBean
     private DeleteTrainingService deleteTrainingService;
+
+    @MockBean
+    private RegisterTrainingService registerTrainingService;
+
+    @MockBean
+    private ChangeTrainingService changeTrainingService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
     
     @BeforeEach
     void setUp() {
@@ -78,9 +93,9 @@ public class TrainingTest {
             }
             """;
 
-        when(trainingMapper.registerTraining(anyLong(), any(LocalDate.class), anyString(), anyString()))
-                .thenReturn(1); // DB登録成功を模擬
-
+        when(registerTrainingService.registerTraining(any(RegisterTrainingRequest.class)))
+            .thenReturn(1);
+        
         mockMvc.perform(post("/api/register-training")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
@@ -176,6 +191,27 @@ public class TrainingTest {
             .andExpect(jsonPath("$.trainingComments").value("問題なし"))
             .andExpect(jsonPath("$.trainingTime").value(date.toString()));
     }
+
+    @Test
+    void registerTraining_Conflict() throws Exception {
+        RegisterTrainingRequest request = new RegisterTrainingRequest();
+        request.setTrainingTime(LocalDate.of(2025, 7, 27));
+        request.setTrainingPlace("競技場");
+        request.setTrainingComments("コメント");
+
+        when(registerTrainingService.registerTraining(any(RegisterTrainingRequest.class)))
+            .thenThrow(new IllegalStateException("この日付の練習日誌は既に登録されています。"));
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        mockMvc.perform(post("/api/register-training")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(request)))
+            .andExpect(status().isConflict())
+            .andExpect(jsonPath("$.error").value("この日付の練習日誌は既に登録されています。"));
+    }
     
     @Test
     void getTraining_Failure_WhenDataNotFound() throws Exception {
@@ -193,51 +229,34 @@ public class TrainingTest {
     
     @Test
     void delete_Success() throws Exception {
-        LocalDate date = LocalDate.of(2025, 7, 27);
-        DeleteTrainingRequest deleteTrainingRequest = new DeleteTrainingRequest(date);
 
-        when(deleteTrainingService.deleteTraining(deleteTrainingRequest))
+        when(deleteTrainingService.deleteTraining(LocalDate.of(2025, 7, 27)))
             .thenReturn(1); // 削除成功
 
-        // JSON文字列を正しく構築
-        String json = """
-        {
-            "trainingDate": "2025-07-27"
-        }
-        """;
-
         mockMvc.perform(delete("/api/delete-training")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
+                .param("trainingDate", "2025-07-27")
+                .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.deleteDate").value("2025-07-27"))
             .andExpect(jsonPath("$.deleteNumber").value(1));
     }
 
     @Test
-    void delete_Failer() throws Exception {
-        String json = """
-        {
-            "trainingDate": ""
-        }
-        """;
+    void deleteTraining_shouldReturn401_whenServiceReturns0() throws Exception {
+        // サービスが0を返すようにモック
+        when(deleteTrainingService.deleteTraining(any(LocalDate.class)))
+            .thenReturn(0);
 
         mockMvc.perform(delete("/api/delete-training")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.error").value("削除したい練習日誌の日付が正しくリクエストされていません"));
+                .param("trainingDate", "2025-07-28"))
+            .andExpect(status().isUnauthorized()) // 401
+            .andExpect(status().reason("Invalid credentials"));
     }
     
     @Test
     void update_Success() throws Exception {
-        LocalDate date = LocalDate.of(2025, 7, 27);
-        String updateTrainingPlace = "練習場所を変更";
-        String updateTrainingComments = "練習日誌を変更";
-//        ChangeTrainingRequest changeTrainingRequest = new ChangeTrainingRequest(date, updateTrainingPlace, updateTrainingComments);
-
-        when(trainingMapper.changeTraining(anyLong(), eq(date), eq(updateTrainingPlace), eq(updateTrainingComments)))
-            .thenReturn(1); // 削除成功
+        when(changeTrainingService.changeTraining(any(ChangeTrainingRequest.class)))
+    .thenReturn(1);
 
         // JSON文字列を正しく構築
         String json = """

@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Training_Info {
+	private Integer training_Id;
     private Integer user_Id;
     private LocalDate training_Time;
     private String training_Place;

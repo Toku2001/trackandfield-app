@@ -1,5 +1,6 @@
 package io.github.Toku2001.trackandfieldapp.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import jakarta.validation.Valid;
@@ -14,9 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import io.github.Toku2001.trackandfieldapp.dto.competition.ChangeCompetitionRequest;
+import io.github.Toku2001.trackandfieldapp.dto.jump.ChangeJumpRequest;
 import io.github.Toku2001.trackandfieldapp.dto.training.ChangeTrainingRequest;
 import io.github.Toku2001.trackandfieldapp.dto.training.ChangeTrainingResponse;
 import io.github.Toku2001.trackandfieldapp.service.competition.ChangeCompetitionService;
+import io.github.Toku2001.trackandfieldapp.service.jump.ChangeJumpService;
 import io.github.Toku2001.trackandfieldapp.service.training.ChangeTrainingService;
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class ChangeController {
     private final ChangeTrainingService changeTrainingSerivice;
     private final ChangeCompetitionService changeCompetitionService;
+    private final ChangeJumpService changeJumpService;
     
     @PutMapping("/change-training")
     public ResponseEntity<?> changeTraining(@Valid @RequestBody ChangeTrainingRequest request, BindingResult bindingResult){
@@ -49,5 +53,14 @@ public class ChangeController {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid credentials");
 		}
         return changeCompetitionNumber;
+    }
+    
+    @PutMapping("/change-jump-records")
+    public int changeJumpRecord(@RequestBody List<ChangeJumpRequest> request){
+        int changeJumpNumber = changeJumpService.changeJump(request);
+        if(changeJumpNumber == 0) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid credentials");
+		}
+        return changeJumpNumber;
     }
 }

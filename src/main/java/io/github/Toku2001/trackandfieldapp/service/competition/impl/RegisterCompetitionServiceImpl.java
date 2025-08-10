@@ -1,5 +1,6 @@
 package io.github.Toku2001.trackandfieldapp.service.competition.impl;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -22,14 +23,18 @@ public class RegisterCompetitionServiceImpl implements RegisterCompetitionServic
     public int registerCompetition(RegisterCompetitionRequest request) {
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	    UserDetailsForToken userDetails = (UserDetailsForToken) authentication.getPrincipal();
-        int registerNumber = competitionMapper.registerCompetition(userDetails.getUserId(),
-        													 request.getCompetitionName(),
-        													 request.getCompetitionPlace(),
-        													 request.getCompetitionTime(),
-        													 request.getCompetitionComments());
-        if (registerNumber == 0) {
-            throw new DatabaseOperationException("練習日誌を登録できませんでした", new Exception());
-        }
-        return registerNumber;
-    }
+	    try {
+	    	int registerNumber = competitionMapper.registerCompetition(userDetails.getUserId(),
+					 request.getCompetitionName(),
+					 request.getCompetitionPlace(),
+					 request.getCompetitionTime(),
+					 request.getCompetitionComments());
+			if (registerNumber == 0) {
+				throw new DatabaseOperationException("練習日誌を登録できませんでした", new Exception());
+			}
+			return registerNumber;
+	    }catch (DataIntegrityViolationException e) {
+	         throw new IllegalStateException("この日付の大会は既に登録されています。");
+	    }
+	}
 }

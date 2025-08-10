@@ -1,7 +1,6 @@
 package io.github.Toku2001.trackandfieldapp.repository;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -30,6 +29,7 @@ public interface TrainingMapper {
     //練習日誌編集
 	 int changeTraining(
 		@Param("userId") long userId,
+		@Param("trainingId") int trainingId,
 		@Param("trainingTime") LocalDate trainingTime,
 		@Param("trainingPlace") String trainingPlace,
 		@Param("trainingComments") String trainingComments

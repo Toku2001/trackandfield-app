@@ -33,6 +33,7 @@ public class CompetitionServiceImpl implements CompetitionService{
             throw new DatabaseOperationException("想定のデータが取得できていません。", new Exception());
         }
         CompetitionResponse competitionResponse = new CompetitionResponse();
+        competitionResponse.setCompetitionId(competition_Info.getCompetition_Id());
         competitionResponse.setCompetitionName(competition_Info.getCompetition_Name());
         competitionResponse.setCompetitionPlace(competition_Info.getCompetition_Place());
         competitionResponse.setCompetitionTime(competition_Info.getCompetition_Time());
@@ -42,7 +43,9 @@ public class CompetitionServiceImpl implements CompetitionService{
 	
 	@Override
 	public CompetitionResponse getNextCompetition() {
-		Competition_Info competition_Info = competitionMapper.getNextCompetition();
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    UserDetailsForToken userDetails = (UserDetailsForToken) authentication.getPrincipal();
+		Competition_Info competition_Info = competitionMapper.getNextCompetition(userDetails.getUserId());
         if (competition_Info == null) {
         	throw new DatabaseOperationException("想定のデータが取得できていません。", new Exception());
         }

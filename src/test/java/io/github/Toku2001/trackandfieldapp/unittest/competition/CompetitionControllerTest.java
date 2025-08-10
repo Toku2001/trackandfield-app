@@ -26,9 +26,13 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
 import io.github.Toku2001.trackandfieldapp.dto.competition.CompetitionResponse;
 import io.github.Toku2001.trackandfieldapp.dto.competition.RegisterCompetitionRequest;
 import io.github.Toku2001.trackandfieldapp.dto.user.UserDetailsForToken;
+import io.github.Toku2001.trackandfieldapp.exception.DatabaseOperationException;
 import io.github.Toku2001.trackandfieldapp.repository.CompetitionMapper;
 import io.github.Toku2001.trackandfieldapp.service.competition.ChangeCompetitionService;
 import io.github.Toku2001.trackandfieldapp.service.competition.CompetitionService;
@@ -180,11 +184,33 @@ public class CompetitionControllerTest {
         
         RegisterCompetitionRequest registerCompetitionRequest = new RegisterCompetitionRequest(competitionName, competitionPlace, competitionTime, competitionComments);
 
-        when(competitionMapper.registerCompetition(anyLong(), any(), any(), any(LocalDate.class), any()))
+        when(registerCompetitionService.registerCompetition(registerCompetitionRequest))
                 .thenReturn(1);
 
-        int result = registerCompetitionServiceImpl.registerCompetition(registerCompetitionRequest);
+        int result = registerCompetitionService.registerCompetition(registerCompetitionRequest);
         assertEquals(1, result);
+    }
+
+    @Test
+    void registerCompetition_Conflict() throws Exception {
+        RegisterCompetitionRequest request = new RegisterCompetitionRequest();
+        request.setCompetitionTime(LocalDate.of(2025, 7, 27));
+        request.setCompetitionPlace("競技場");
+        request.setCompetitionComments("コメント");
+        request.setCompetitionName("試合");
+
+        when(registerCompetitionService.registerCompetition(any(RegisterCompetitionRequest.class)))
+            .thenThrow(new IllegalStateException("この日付の競技会情報は既に登録されています。"));
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        mockMvc.perform(post("/api/register-competition")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(request)))
+            .andExpect(status().isConflict())
+            .andExpect(jsonPath("$.error").value("この日付の競技会情報は既に登録されています。"));
     }
     
     //PUT
@@ -231,47 +257,37 @@ public class CompetitionControllerTest {
     //DELETE
     @Test
     void deleteCompetition_validInput_shouldReturn200() throws Exception {
-        when(deleteCompetitionService.deleteCompetition(any())).thenReturn(1);
-
-        String json = """
-            {
-                "competitionDate": "2025-07-28"
-            }
-            """;
+        when(deleteCompetitionService.deleteCompetition(LocalDate.of(2025, 7, 27))).thenReturn(1);
 
         mockMvc.perform(delete("/api/delete-competition")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
+                .param("competitionDate", "2025-07-27")
+                .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(content().string("1"));
     }
-    
-    @Test
-    void deleteCompetition_invalid_shouldReturn401() throws Exception {
-        when(deleteCompetitionService.deleteCompetition(any())).thenReturn(0); // 失敗
 
-        String json = """
-            {
-                "competitionDate": "2025-07-28"
-            }
-            """;
+    @Test
+    void deleteCompetition_shouldReturn401_whenServiceReturns0() throws Exception {
+        // サービスが0を返すようにモック
+        when(deleteCompetitionService.deleteCompetition(any(LocalDate.class)))
+            .thenReturn(0);
 
         mockMvc.perform(delete("/api/delete-competition")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-            .andExpect(status().isUnauthorized())
+                .param("competitionDate", "2025-07-28"))
+            .andExpect(status().isUnauthorized()) // 401
             .andExpect(status().reason("Invalid credentials"));
     }
     
     //GET
     @Test
     void getCompetitionByDate_valid_shouldReturn200() throws Exception {
-        CompetitionResponse response = new CompetitionResponse("大会", "競技場", LocalDate.of(2025, 7, 28), "コメント");
+        CompetitionResponse response = new CompetitionResponse(1, "大会", "競技場", LocalDate.of(2025, 7, 28), "コメント");
         when(competitionService.getCompetitionByDate(any())).thenReturn(response);
 
         mockMvc.perform(get("/api/get-competition")
                 .param("competitionDate", "2025-07-28"))
             .andExpect(status().isOk())
+            .andExpect(jsonPath("$.competitionId").value(1))
             .andExpect(jsonPath("$.competitionName").value("大会"))
             .andExpect(jsonPath("$.competitionPlace").value("競技場"))
             .andExpect(jsonPath("$.competitionTime").value("2025-07-28"))
@@ -291,12 +307,13 @@ public class CompetitionControllerTest {
     //次の大会情報を取得
     @Test
     void getNextCompetition_valid_shouldReturn200() throws Exception {
-        CompetitionResponse response = new CompetitionResponse("大会", "競技場", LocalDate.of(2025, 7, 28), "コメント");
+        CompetitionResponse response = new CompetitionResponse(1, "大会", "競技場", LocalDate.of(2025, 7, 28), "コメント");
         when(competitionService.getNextCompetition()).thenReturn(response);
 
         mockMvc.perform(get("/api/get-competition-upcoming"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.competitionName").value("大会"))
+            .andExpect(jsonPath("$.competitionId").value(1))
             .andExpect(jsonPath("$.competitionPlace").value("競技場"))
             .andExpect(jsonPath("$.competitionTime").value("2025-07-28"))
             .andExpect(jsonPath("$.competitionComments").value("コメント"));

@@ -23,6 +23,7 @@ public class ChangeCompetitionServiceImpl implements ChangeCompetitionService{
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	    UserDetailsForToken userDetails = (UserDetailsForToken) authentication.getPrincipal();
 	    int updateCompetitionNumber = competitionMapper.changeCompetition(userDetails.getUserId(),
+	    															  request.getCompetitionId(),
 	    															  request.getCompetitionName(),
 																	  request.getCompetitionPlace(),
 																	  request.getCompetitionTime(),

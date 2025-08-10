@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor 
 public class ChangeCompetitionRequest {
+	private int competitionId;
     private String competitionName;
     private String competitionPlace;
     private LocalDate competitionTime;

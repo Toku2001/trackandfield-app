@@ -7,7 +7,7 @@
 	</insert>
 
 <select id="getTrainingByDate" resultType="io.github.Toku2001.trackandfieldapp.entity.Training_Info">
-	SELECT training_time, training_place, training_comments FROM training_info 
+	SELECT training_id, training_time, training_place, training_comments FROM training_info 
 	WHERE training_time = #{trainingTime}
 	AND user_id = #{userId}
 	</select>
@@ -19,13 +19,13 @@
 	
 <update id="changeTraining" parameterType="io.github.Toku2001.trackandfieldapp.entity.Training_Info">
 	UPDATE training_info 
-	SET training_place = #{trainingPlace}, training_comments = #{trainingComments}
+	SET training_place = #{trainingPlace}, training_comments = #{trainingComments}, training_time = #{trainingTime}
 	WHERE user_id = #{userId}
-	AND training_time = #{trainingTime}
+	AND training_id = #{trainingId}
 	</update>
 	
-<delete id="deleteTraining" parameterType="io.github.Toku2001.trackandfieldapp.entity.Training_Info">
-	DELETE FROM training_info 
+<delete id="deleteTraining" parameterType="io.github.Toku2001.trackandfieldapp.entity.Training_Info">-->
+	DELETE FROM training_info
 	WHERE user_id = #{userId}
 	AND training_time = #{trainingTime}
 	</delete>

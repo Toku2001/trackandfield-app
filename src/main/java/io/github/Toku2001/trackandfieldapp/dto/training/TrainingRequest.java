@@ -2,9 +2,7 @@ package io.github.Toku2001.trackandfieldapp.dto.training;
 
 
 
-import java.time.LocalDate;
-
-import jakarta.validation.constraints.NotNull;
+import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,10 +11,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor 
-public class ChangeTrainingRequest {
-	private int trainingId;
-	@NotNull(message = "更新したい練習日誌の日付が正しくリクエストされていません")
-    private LocalDate trainingTime;
+public class TrainingRequest {
+    private Date trainingTime;
     private String trainingPlace;
     private String trainingComments;
 //    private JumpRecordRequestDto jumpRecord;
