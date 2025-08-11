@@ -24,7 +24,7 @@ public class MailServiceImpl implements MailService{
     @Value("${resend.from.email}")
     private String fromEmail;
 
-    public void sendPasswordResetMail(PasswordResetRequest userRequest, String resetLink){
+    public boolean sendPasswordResetMail(PasswordResetRequest userRequest, String resetLink){
     	Resend resend = new Resend(resendApiKey);
     	CreateEmailOptions params = CreateEmailOptions.builder()
                 .from("onboarding@resend.dev")
@@ -41,8 +41,12 @@ public class MailServiceImpl implements MailService{
          try {
             CreateEmailResponse data = resend.emails().send(params);
             System.out.println(data.getId());
+            if(data != null && data.getId() != null && !data.getId().isEmpty()) {
+            	return true;
+            }
         } catch (ResendException e) {
             e.printStackTrace();
         }
+		 return false;
     }
 }

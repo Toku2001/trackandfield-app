@@ -4,5 +4,5 @@ import io.github.Toku2001.trackandfieldapp.dto.password.PasswordResetRequest;
 
 public interface MailService {
 	//パスワード再設定メールの送信
-	public void sendPasswordResetMail(PasswordResetRequest request, String resetLink);
+	public boolean sendPasswordResetMail(PasswordResetRequest request, String resetLink);
 }

@@ -27,7 +27,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
 	private final UserMapper userMapper;
 	private final MailService mailService;
 
-	public void requestReset(PasswordResetRequest request){
+	public boolean requestReset(PasswordResetRequest request){
 		System.out.println(request.getUserMail());
 		//パスワード再設定のリクエストをして生きたユーザーが登録されているユーザーか判定する
 		int existUser = userMapper.checkUser(request.getUserName(), request.getUserMail());
@@ -38,10 +38,14 @@ public class PasswordResetServiceImpl implements PasswordResetService {
 		LocalDateTime expiryDate = LocalDateTime.now().plusMinutes(10);	
 
 		PasswordResetToken resetToken = new PasswordResetToken(request, token, expiryDate);
-		passwordMapper.insert(resetToken);
-
-		String resetLink = "http://localhost:8080/api/reset-password?token=" + token;
-		mailService.sendPasswordResetMail(request, resetLink);
+		int insertCount = passwordMapper.insert(resetToken);
+		if(insertCount == 1) {
+			String resetLink = "http://localhost:8080/passwordReset/newpassword.html?token=" + token;
+			if(mailService.sendPasswordResetMail(request, resetLink)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public boolean resetPassword(NewPasswordRequest request) {
