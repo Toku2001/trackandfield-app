@@ -58,7 +58,8 @@ jobs:
 
       - name: Run tests and generate coverage report
         run: |
-          ./gradlew clean test --tests "io.github.Toku2001.trackandfieldapp.unittest.resetpassword.*"
+          ./gradlew clean test --tests "io.github.Toku2001.trackandfieldapp.unittest.resetpassword.ResetPasswordControllerTest" \
+          ./gradlew clean test --tests "io.github.Toku2001.trackandfieldapp.unittest.resetpassword.ResetPasswordServiceTest" \
           ./gradlew test \
           ./gradlew jacocoTestReport
         env:
