@@ -56,9 +56,12 @@ jobs:
       - name: Grant execute permission for Gradle
         run: chmod +x ./gradlew
 
-      - name: Run tests and generate coverage report
+      - name: Run only ResetPassword tests and generate coverage report
         run: |
-          ./gradlew clean test --tests "*ResetPasswordControllerTest" --tests "*ResetPasswordServiceTest" --no-scan --no-build-cache
+          ./gradlew clean test \
+            --tests "io.github.Toku2001.trackandfieldapp.unittest.resetpassword.ResetPasswordControllerTest" \
+            --tests "io.github.Toku2001.trackandfieldapp.unittest.resetpassword.ResetPasswordServiceTest" \
+            --no-scan --no-build-cache
           ./gradlew jacocoTestReport
         env:
           POSTGRES_DB: ${{ secrets.DB_NAME }}
