@@ -56,12 +56,14 @@ jobs:
       - name: Grant execute permission for Gradle
         run: chmod +x ./gradlew
 
-      - name: Run only ResetPassword tests and generate coverage report
+      - name: Run tests and generate coverage report
         run: |
-          ./gradlew clean test \
-            --tests "io.github.Toku2001.trackandfieldapp.unittest.resetpassword.ResetPasswordControllerTest" \
-            --tests "io.github.Toku2001.trackandfieldapp.unittest.resetpassword.ResetPasswordServiceTest" \
-            -i --no-scan --no-build-cache
+          ./gradlew clean test --tests "io.github.Toku2001.trackandfieldapp.unittest.competition.CompetitionControllerTest"
+          ./gradlew test \
+          --tests "io.github.Toku2001.trackandfieldapp.unittest.competition.CompetitionServiceImplTest" \
+          --tests "io.github.Toku2001.trackandfieldapp.unittest.competition.CompetitionControllerTest" \
+          --tests "io.github.Toku2001.trackandfieldapp.AuthController" \
+          --tests "io.github.Toku2001.trackandfieldapp.TrainingTest"
           ./gradlew jacocoTestReport
         env:
           POSTGRES_DB: ${{ secrets.DB_NAME }}
@@ -72,15 +74,8 @@ jobs:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           RESEND_KEY: ${{ secrets.RESEND_KEY }}
           USER_MAIL: ${{ secrets.USER_MAIL }}
-      
-      - name: Upload test report
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-report
-          path: build/reports/tests/test
 
       - name: Upload coverage to Codecov
-        if: always() 
         uses: codecov/codecov-action@v4
         with: 
           token: ${{ secrets.CODECOV_TOKEN }}
