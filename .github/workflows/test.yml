@@ -58,9 +58,7 @@ jobs:
 
       - name: Run tests and generate coverage report
         run: |
-          ./gradlew clean test \
-            --tests "io.github.Toku2001.trackandfieldapp.unittest.resetpassword.ResetPasswordControllerTest" \
-            --tests "io.github.Toku2001.trackandfieldapp.unittest.resetpassword.ResetPasswordServiceTest"
+          ./gradlew clean test --tests "*ResetPasswordControllerTest" --tests "*ResetPasswordServiceTest" --no-scan --no-build-cache
           ./gradlew jacocoTestReport
         env:
           POSTGRES_DB: ${{ secrets.DB_NAME }}
