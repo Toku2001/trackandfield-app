@@ -17,7 +17,9 @@ import org.springframework.web.server.ResponseStatusException;
 import io.github.Toku2001.trackandfieldapp.dto.authentication.LoginRequest;
 import io.github.Toku2001.trackandfieldapp.dto.authentication.LoginResponse;
 import io.github.Toku2001.trackandfieldapp.dto.password.NewPasswordRequest;
+import io.github.Toku2001.trackandfieldapp.dto.password.NewPasswordResponse;
 import io.github.Toku2001.trackandfieldapp.dto.password.PasswordResetRequest;
+import io.github.Toku2001.trackandfieldapp.dto.password.PasswordResetResponse;
 import io.github.Toku2001.trackandfieldapp.dto.user.RegisterRequest;
 import io.github.Toku2001.trackandfieldapp.dto.user.RegisterResponse;
 import io.github.Toku2001.trackandfieldapp.exception.DatabaseOperationException;
@@ -72,19 +74,23 @@ public class AuthController {
 	}
 
     @PostMapping("/request-password-reset")
-    public String requestReset(@RequestBody PasswordResetRequest request) {
+    public PasswordResetResponse requestReset(@RequestBody PasswordResetRequest request) {
         try{
-        	passwordResetService.requestReset(request);
-        	return "再設定リンクを送信しました。";
+        	if(passwordResetService.requestReset(request)) {
+        		return new PasswordResetResponse(true, "再設定リンクを送信しました。");
+        	}
         }catch(DatabaseOperationException e) {
         	System.out.println("ユーザー登録が未完了です。");
-    		throw new ResponseStatusException(HttpStatus.FORBIDDEN, "ユーザー登録が未完了です。");
+//    		throw new ResponseStatusException(HttpStatus.FORBIDDEN, "ユーザー登録が未完了です。");
+    		return new PasswordResetResponse(false, "ユーザー名またはメースアドレスが違います。");
         }
+		return new PasswordResetResponse(false, "再設定リンクを送信できませんでした。");
     }
 
     @PostMapping("/reset-password")
-    public String resetPassword(@RequestBody NewPasswordRequest request) {
+    public NewPasswordResponse resetPassword(@RequestBody NewPasswordRequest request) {
         boolean success = passwordResetService.resetPassword(request);
-        return success ? "パスワードが更新されました。" : "トークンが無効または期限切れです。";
+        String responseMessage = success ? "パスワードが更新されました。" : "トークンが無効または期限切れです。";
+        return new NewPasswordResponse(responseMessage, success);
     }
 }

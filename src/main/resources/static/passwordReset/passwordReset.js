@@ -1,8 +1,8 @@
 document.getElementById("resetForm").addEventListener("submit", function(event) {
     event.preventDefault();
 
-    const username = document.getElementById("resetUsername").value.trim();
-    const email = document.getElementById("resetEmail").value.trim();
+    const userName = document.getElementById("resetUsername").value.trim();
+    const userMail = document.getElementById("resetEmail").value.trim();
 
     fetch('http://localhost:8080/auth/request-password-reset', {
         method: 'POST',
@@ -11,11 +11,11 @@ document.getElementById("resetForm").addEventListener("submit", function(event) 
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
-            alert("パスワード再設定用のメールを送信しました。");
+        if (data.sendLink) {
+            alert(data.responseMessage);
             window.location.href = PATHS.LOGIN_PAGE;
         } else {
-            alert(data.message);
+            alert(data.responseMessage);
         }
     })
     .catch(error => console.error('Error:', error));

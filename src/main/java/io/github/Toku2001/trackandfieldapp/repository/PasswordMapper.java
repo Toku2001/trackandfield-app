@@ -12,7 +12,7 @@ public interface PasswordMapper {
     Optional<PasswordResetToken> findUserMail(@Param("user_Name") String userName,
     										  @Param("token") String token);
     void deleteByToken(@Param("token") String token); 
-    void insert(PasswordResetToken passwordResetToken);
+    int insert(PasswordResetToken passwordResetToken);
     int updateNewPassword(@Param("user_Name") String userNames,
     				      @Param("user_Mail") String userMail,
     					  @Param("newUserPassword") String newUserPassword);
