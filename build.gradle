@@ -38,7 +38,7 @@ jacocoTestReport {
                     '**/entity/**',             					// エンティティ全体
                     '**/exception/**',          					// 例外系
                     '**/authentication/**',     					// トークン処理
-                    '**/security/**'	     					    // セキュリティ
+                    '**/MailServiceImpl.class'	     				// メール送信の外部API
                 ])
             })
         )
