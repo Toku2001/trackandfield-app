@@ -1,0 +1,132 @@
+/* 共通レイアウト */
+body {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background: #f4f6f8;
+  margin: 0;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* タイトル */
+h1 {
+  color: #333;
+  margin-top: 40px;
+  margin-bottom: 20px;
+  font-size: 24px;
+  text-align: center;
+}
+
+/* テーブル共通デザイン */
+table {
+  border-collapse: collapse;
+  width: 90%;
+  max-width: 600px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* テーブルヘッダー */
+th {
+  background-color: #007bff;
+  color: white;
+  padding: 12px 16px;
+  text-align: left;
+  width: 30%;
+  font-weight: bold;
+}
+
+/* テーブルデータ */
+td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #ddd;
+  background-color: #fafafa;
+}
+
+/* 最終行の境界線を削除 */
+tr:last-child td {
+  border-bottom: none;
+}
+
+/* ボタン共通スタイル */
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin: 10px 5px 0;
+}
+
+/* ホバー時の色変更 */
+button:hover {
+  background-color: #0056b3;
+}
+
+/* ボタンを並べる */
+#button-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* レスポンシブ対応 */
+@media screen and (max-width: 600px) {
+  table {
+    width: 100%;
+  }
+
+  h1 {
+    font-size: 20px;
+  }
+
+  th, td {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  button {
+    width: 100%;
+    padding: 12px 0;
+    margin: 10px 0 0;
+  }
+
+  #button-wrapper {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* 入力欄の共通スタイル */
+input[type="text"],
+input[type="date"],
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fff;
+  resize: vertical; /* textareaのリサイズを縦方向のみに制限 */
+}
+
+#jump-records table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1em;
+  font-size: 0.95em;
+}
+
+#jump-records th, #jump-records td {
+  border: 1px solid #999;
+  padding: 6px 10px;
+  text-align: center;
+}

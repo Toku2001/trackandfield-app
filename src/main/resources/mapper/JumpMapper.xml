@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.github.Toku2001.trackandfieldapp.repository.JumpMapper">
+
+  <!-- 跳躍記録の登録 -->
+  <insert id="registerJump" parameterType="map">
+    INSERT INTO jump_events (
+      user_id,
+      event_code,
+      jump_distance,
+      approach_steps,
+      pole_length,
+      pole_stiffness,
+      record_type,
+      jump_date
+    ) VALUES (
+      #{userId},
+      #{event.event},
+      #{event.distance},
+      #{event.approach},
+      #{event.poleFeat},
+      #{event.polePond},
+      #{event.recordType},
+      #{event.jumpDate}
+    )
+  </insert>
+  
+  <select id="getJumpRecord" resultType="io.github.Toku2001.trackandfieldapp.entity.Jump_Events">
+    SELECT * FROM jump_events
+    WHERE user_id = #{userId}
+      AND jump_date = #{date}
+  </select>
+  
+  <!-- 跳躍情報の更新 -->
+  <update id="changeJump">
+    UPDATE jump_events
+    SET
+      user_id = #{userId},
+      event_code = #{event.event},
+      jump_distance = #{event.distance},
+      approach_steps = #{event.approach},
+      pole_length = #{event.poleFeat},
+      pole_stiffness = #{event.polePond},
+      record_type = #{event.recordType},
+      jump_date = #{event.jumpDate}
+    WHERE user_id = #{userId}
+      AND jump_event_id = #{event.jumpEventId}
+  </update>
+  
+  <!-- 1件削除 -->
+  <delete id="deleteById" parameterType="long">
+    DELETE FROM jump_events
+    WHERE jump_event_id = #{jumpEventId}
+  </delete>
+  
+  <!-- 指定日付の全件削除 -->
+  <delete id="deleteAllByDate" parameterType="java.time.LocalDate">
+    DELETE FROM jump_events
+    WHERE jump_date = #{jumpDate}
+  </delete>
+  
+  <!-- 自己ベスト取得 -->
+  <select id="getPersonalBest" resultType="io.github.Toku2001.trackandfieldapp.entity.Jump_Events">
+  SELECT DISTINCT ON (event_code)
+    jump_event_id,
+    user_id,
+    event_code,
+    jump_distance,
+    approach_steps,
+    pole_length,
+    pole_stiffness,
+    record_type,
+    jump_date,
+    insert_date,
+    update_date
+  FROM jump_events
+  WHERE user_id = #{userId}
+  ORDER BY event_code, jump_distance DESC, jump_date ASC
+</select>
+
+</mapper>

@@ -1,0 +1,151 @@
+/* 共通レイアウト */
+body {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background: #f4f6f8;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* ページタイトル */
+h1 {
+  text-align: center;
+  margin-top: 40px;
+  color: #333;
+}
+
+/* カウントダウン表示 */
+#goalSection {
+  margin: 20px 0;
+  font-size: 18px;
+  color: #007bff;
+}
+
+/* カレンダーセクション */
+#calendar {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 600px;
+  margin-bottom: 30px;
+}
+
+#calendar h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+#calendar button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  margin: 0 5px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+#calendar button:hover {
+  background-color: #0056b3;
+}
+
+/* カレンダー表 */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+th, td {
+  width: 14.2%;
+  text-align: center;
+  padding: 12px;
+  border-radius: 6px;
+  transition: background-color 0.3s;
+}
+
+th {
+  background-color: #e9ecef;
+  color: #333;
+}
+
+/* 日付セルホバー */
+td:hover {
+  background-color: #dbeafe;
+  cursor: pointer;
+}
+
+/* 今日の日付 */
+.today {
+  background-color: #ffeb3b;
+  font-weight: bold;
+  border-radius: 50%;
+}
+
+/* ボタン類 */
+#actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+#actions button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#actions button:hover {
+  background-color: #0056b3;
+}
+
+/* レスポンシブ対応 */
+@media screen and (max-width: 600px) {
+  #calendar {
+    padding: 20px;
+  }
+
+  th, td {
+    padding: 8px;
+  }
+
+  #actions button {
+    width: 100%;
+    padding: 10px;
+  }
+}
+
+#nextTournament, #records {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  margin: 20px auto;
+  max-width: 600px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+#nextTournament h2, #records h2 {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+#nextTournamentInfo p, #recordList li {
+  font-size: 16px;
+  color: #444;
+  margin: 5px 0;
+}

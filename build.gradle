@@ -1,0 +1,116 @@
+plugins {
+	id 'java'
+	id 'jacoco' 
+	id 'war'
+	id 'org.springframework.boot' version '3.4.5'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'io.github.Toku2001'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+jacoco {
+    toolVersion = "0.8.11" 
+}
+
+jacocoTestReport {
+    dependsOn test // テストの後に実行
+
+    reports {
+        xml.required = true
+        csv.required = false
+        html.required = true
+        html.outputLocation = layout.buildDirectory.dir('reports/jacoco/test/html') 
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(
+            files(classDirectories.files.collect {
+                fileTree(dir: it, exclude: [
+                    '**/TrackAndFieldAppApplication.class',  		// 起動クラス
+                    '**/dto/**',                					// DTO全体
+                    '**/entity/**',             					// エンティティ全体
+                    '**/exception/**',          					// 例外系
+                    '**/authentication/**',     					// トークン処理
+                    '**/MailServiceImpl.class'	     				// メール送信の外部API
+                ])
+            })
+        )
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.6 // カバレッジ 60%以上
+            }
+        }
+    }
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+    // Spring Boot Starters
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    
+    // security
+    implementation 'org.springframework.security:spring-security-crypto'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    
+    // バリデーションAPI
+    implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
+
+    // バリデーションの実装（Hibernate Validator）
+    implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
+
+    // MyBatis
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
+
+    // JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    
+    // Postgres
+    runtimeOnly 'org.postgresql:postgresql'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // 開発支援
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    //テスト
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    // テスト用にH2を追加
+    testImplementation 'com.h2database:h2'
+    
+    //パスワード再設定
+    implementation 'com.resend:resend-java:3.1.0'
+    
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

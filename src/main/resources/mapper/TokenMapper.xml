@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.github.Toku2001.trackandfieldapp.repository.TokenMapper">
+    <!-- リフレッシュトークンの更新（既存ユーザー） -->
+    <update id="updateRefreshToken" parameterType="io.github.Toku2001.trackandfieldapp.entity.User_Info">
+        UPDATE user_info
+        SET refresh_token = #{refreshToken}
+        WHERE user_id = #{userId}
+    </update>
+
+    <!-- 指定ユーザーのトークンを取得 -->
+    <select id="findTokenByUserInfo" resultType="String">
+        SELECT refresh_token
+        FROM user_info
+        WHERE user_id = #{userId}
+        AND user_name = #{userName}
+    </select>
+
+    <!-- リフレッシュトークンの削除（ログアウト時など） -->
+    <update id="deleteTokenByUserId" parameterType="io.github.Toku2001.trackandfieldapp.entity.User_Info">
+        UPDATE user_info
+        SET refresh_token = NULL
+        WHERE user_id = #{userId}
+    </update>
+</mapper>

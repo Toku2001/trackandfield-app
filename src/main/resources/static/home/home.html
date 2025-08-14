@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>陸上ノート</title>
+  <link rel="stylesheet" href="./home.css">
+</head>
+<body>
+  <header>
+    <h1><span id="userName"></span>の陸上ノート</h1>
+  </header>
+
+  <section id="goalSection">
+    <p id="countdown"></p>
+  </section>
+
+  <section id="nextTournament">
+    <h2>次の競技会</h2>
+    <div id="nextTournamentInfo">
+      <p id="nextTournamentName"></p>
+      <p id="nextTournamentPlace"></p>
+      <p id="nextTournamentDate"></p>
+      <p id="nextCountdown"></p>
+    </div>
+  </section>
+
+  <section id="records">
+    <h2>自己ベスト</h2>
+    <ul id="recordList"></ul>
+  </section>
+
+  <section id="calendar">
+    <h2 id="calendarTitle"></h2>
+    <button onclick="changeMonth(-1)">前の月</button>
+    <button onclick="changeMonth(1)">次の月</button>
+    <table>
+      <thead>
+        <tr><th>日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th></tr>
+      </thead>
+      <tbody id="calendarBody"></tbody>
+    </table>
+  </section>
+
+  <section id="actions">
+    <button onclick="goToTraining()">練習日誌</button>
+    <button onclick="goToTournament()">試合予定</button>
+	<button onclick="goToJumpRecord()">跳躍記録</button>
+    <button onclick="logout()">ログアウト</button>
+  </section>
+
+  <script src="/config.js"></script>
+  <script src="home.js"></script>
+</body>
+</html>
